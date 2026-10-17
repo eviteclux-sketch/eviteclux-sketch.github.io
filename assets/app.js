@@ -1184,7 +1184,7 @@ function ask(text){
   A.ctl = new AbortController();
   $('#a-send').hidden = true; $('#a-stop').hidden = false; setStatus('L’assistant réfléchit. Ça peut prendre jusqu’à une minute.');
   A.sample([{role: 'user', content: RULES}].concat(A.turns), {tools: toolList(), cache: false, signal: A.ctl.signal, onText: function(u){ out.textContent = u.text; $('#a-thread').scrollTop = 1e9; }})
-    .then(function(res){ out.textContent = res.text; A.turns.push({role: 'assistant', content: res.text}); if (res.truncated) bubble('sys', 'Réponse coupée : pose une question plus courte.'); setStatus(''); })
+    .then(function(res){ out.textContent = plainText(res.text); A.turns.push({role: 'assistant', content: res.text}); if (res.truncated) bubble('sys', 'Réponse coupée : pose une question plus courte.'); setStatus(''); })
     .catch(function(e){
       var code = e && e.code;
       if (e && e.text){ out.textContent = e.text; } else out.remove();
@@ -1195,6 +1195,8 @@ function ask(text){
     })
     .then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; });
 }
+// les réponses s'affichent en texte simple : on retire la mise en forme Markdown (gras, titres, puces en astérisque)
+function plainText(s){ return String(s || '').replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/__([^_\n]+)__/g, '$1').replace(/^#{1,6}\s+/gm, '').replace(/^(\s*)[*•]\s+/gm, '$1– ').trim(); }
 // ---------- assistant sur le site web : abonnement, connexion, serveur ----------
 var ACC = null;
 function api(path, body, signal){
@@ -1301,6 +1303,7 @@ function askSite(text){
       if (r.status_ !== 200 || !Array.isArray(r.content)) throw r;
       A.turns.push({role: 'assistant', content: r.content, sig: r.sig});
       var txt = r.content.filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
+      txt = plainText(txt);
       if (txt){ if (out){ out.textContent = txt; out = null; } else bubble('ai', txt); }
       if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; accountLine(); }
       var hasTool = r.content.some(function(b){ return b.type === 'tool_use'; });
