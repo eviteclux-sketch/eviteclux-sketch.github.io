@@ -1198,7 +1198,9 @@ function ask(text){
 // ---------- assistant sur le site web : abonnement, connexion, serveur ----------
 var ACC = null;
 function api(path, body, signal){
-  return fetch(path, {method: body === undefined ? 'GET' : 'POST', headers: body === undefined ? {} : {'content-type': 'application/json'}, body: body === undefined ? undefined : JSON.stringify(body), credentials: 'same-origin', signal: signal})
+  var h = body === undefined ? {} : {'content-type': 'application/json'}, jt = lsGet('pnr-session');
+  if (jt) h['x-pnr-session'] = jt;
+  return fetch(path, {method: body === undefined ? 'GET' : 'POST', headers: h, body: body === undefined ? undefined : JSON.stringify(body), credentials: 'same-origin', signal: signal})
     .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ j.status_ = r.status; return j; }); });
 }
 function showPay(msg){ A.ready = false; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').hidden = !$('#a-thread').children.length; $('#a-pay').hidden = false; $('#a-pay-msg').textContent = msg || ''; }
@@ -1259,12 +1261,13 @@ if (SITE){
     api('/api/code', {code: c}).then(function(r){
       b.disabled = false;
       if (!r.ok){ toast(r.message || 'Code d’accès invalide.'); return; }
+      if (r.jeton) lsSet('pnr-session', r.jeton);
       $('#a-code-in').value = ''; $('#a-thread').innerHTML = ''; toast('Accès ouvert. Pose ta première question.'); siteStart();
     }, function(){ b.disabled = false; toast('Connexion impossible. Réessaie.'); });
   });
   $('#a-account').addEventListener('click', function(e){
     var b = e.target.closest('[data-acc]'); if (!b) return;
-    if (b.dataset.acc === 'logout') api('/api/logout', {}).then(function(){ location.reload(); });
+    if (b.dataset.acc === 'logout') api('/api/logout', {}).then(function(){ lsSet('pnr-session', null); location.reload(); }, function(){ lsSet('pnr-session', null); location.reload(); });
     else api('/api/portal', {}).then(function(r){ if (r.url) location.href = r.url; else toast(r.message || 'Espace d’abonnement indisponible.'); });
   });
 }
@@ -1325,7 +1328,7 @@ function askSite(text){
     if (out) out.remove();
     A.turns = before;
     if (e && e.name === 'AbortError'){ setStatus('Arrêté.'); return; }
-    if (e && (e.error === 'auth' || e.error === 'inactive')){ setStatus(''); showPay(e.message); return; }
+    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(e.message); return; }
     if (e && e.error === 'bad_request'){ A.turns = []; A.last = null; bubble('sys', 'Nouvelle conversation : la précédente était trop longue. Repose ta question.'); setStatus(''); return; }
     setStatus((e && e.message) || 'La réponse a été interrompue. Réessaie.');
   }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; });

@@ -3,7 +3,7 @@
  "fichiers": {
   "404.html": {
    "taille": 2978,
-   "sha256": "7d438376514862e0715ebcc7e4b28b4c3c125af0d457c661a00b80aaa3c8b76e"
+   "sha256": "b6bf66430cccf527e8d3fef0e737e9d533c04316fc913c3e60338bbecb6b35ec"
   },
   "_headers": {
    "taille": 262,
@@ -18,8 +18,8 @@
    "sha256": "2b979ab6654a85232577fa5fe211b8ebc81cf47c9c8fe69fe98bc80199d96f4d"
   },
   "assets/app.js": {
-   "taille": 137592,
-   "sha256": "324cfb6bbf1e0a0060e20fcb85bb51537a68f95f0dd6f46fbef1c1cdfd7cc5d2"
+   "taille": 137859,
+   "sha256": "8b9ba7614c0df186f556d93dbbae8d3042335f7f8c5afd47ef157a410e57ad8b"
   },
   "assets/pdf-lib.LICENSE.md": {
    "taille": 1070,
@@ -31,23 +31,23 @@
   },
   "calcul-prix-au-m2/index.html": {
    "taille": 5839,
-   "sha256": "d6ae15620070e500c4f6f73ef5f502ac47e6f47f39ec33ad15f23f61ed11303e"
+   "sha256": "5c1e884c018810b57cedf0302a41da4b2989aeb266b7f599f80eb82213aecc08"
   },
   "calcul-prix-de-revient/index.html": {
    "taille": 6048,
-   "sha256": "3b85b054ff5ab3272deb8d8afeeaa5da6cf1454e82e18b20dcf510857f173d3c"
+   "sha256": "9e10fa93be6b941c57de5c8063052b8ed637c8f70c7b4ff887aab3e7912beac8"
   },
   "calcul-taux-horaire-independant/index.html": {
    "taille": 5807,
-   "sha256": "c03a8bbc2b9cf9913de4f5974fac682f8a8d8e950b8693440c08c27487f32596"
+   "sha256": "1f191a86a8118ebfb0b8d3fe6f18a472da64dfb9cfab720149c57ec4ba72db83"
   },
   "cgv/index.html": {
    "taille": 4245,
-   "sha256": "53c1f88340cc2e453a8f017e39e21b7e08cbff4b3562c9e2be62040d799eae65"
+   "sha256": "652fd4626e62874af4838de5f74f8cf843d894a842bba43eae28375746acc224"
   },
   "confidentialite/index.html": {
-   "taille": 4822,
-   "sha256": "f218e932eb75e17d9918dad7140329de8e11c911e1399abd3db1545d12d8ef3c"
+   "taille": 4920,
+   "sha256": "42ef0f110c5475747a7efe0de51a8354bbc1e25ca2ba00a9d605cbb385d9e6d7"
   },
   "favicon.svg": {
    "taille": 249,
@@ -55,35 +55,35 @@
   },
   "guides/index.html": {
    "taille": 4365,
-   "sha256": "c5ad6b5cc3679550974e2271cf1199695206433d9c25023e3865d0b2a6f489bc"
+   "sha256": "9bb590e1aea15016429a3be37d275b8e8114de2f5edee87989796cf527b78a35"
   },
   "heures-facturables/index.html": {
    "taille": 4733,
-   "sha256": "68f024075cc284132b86a58f20c21e0f026f34450e1d1eea2323429e2c969aad"
+   "sha256": "0da7bbeab1632eed1997b0c1bf407a2d75807dc44539c761521cbc1aaae205e0"
   },
   "index.html": {
    "taille": 23097,
-   "sha256": "dd1c6ee0be715426cbd6055bc4c660b7b8bf4d3d5f2a18b7f954466506b50cb8"
+   "sha256": "e6a99ac984ed29de90713a900473e97430670100721d3aa4abaad21ea5f9e323"
   },
   "mentions-legales/index.html": {
    "taille": 3711,
-   "sha256": "f0c178821f3d33e1003f6ff2aee8aee3474ed0a103b00af679c2f8296df57459"
+   "sha256": "37f46dec5ffa22d14109ac799499a1a795955c8d717df34ab7fd3bdf8851d5b6"
   },
   "prix-au-m2-toiture/index.html": {
    "taille": 5514,
-   "sha256": "2913c772b2719694fc2d4c3f83f097a118158f2b4fe243371fd67d51a2a7a1c6"
+   "sha256": "5700539d037e495942eb3dfeb2c9375813c7bdcf9c7fa163134c230bc56e3dd4"
   },
   "prix-de-revient-au-kilo/index.html": {
    "taille": 5693,
-   "sha256": "32eeebd88f95e2104b143409f9f0f034f29e93142598b982684d1050f7e96db6"
+   "sha256": "4245e3188a783cfddc095bc28c90418c7d5de8b125b4c9297e58149279924d70"
   },
   "prix-de-revient-pain/index.html": {
    "taille": 5186,
-   "sha256": "e953294db128c4b10331e5b0a620765082adf9d674f0d7594eca6df1c1afacb1"
+   "sha256": "eca6f7c9b4e09c9f12a59b772cc22e48996cd5255b876967d4e04e334a086b89"
   },
   "rendement-chantier/index.html": {
    "taille": 4976,
-   "sha256": "b7419af21305b14352db6d5dc17cabaa06d98bfd9e206dc0874da8b3e3a30f13"
+   "sha256": "6b41d9e9ba054a94ea4dd788a811e83a4fba0b20b0ce1c827381e93a043746b2"
   },
   "robots.txt": {
    "taille": 85,
@@ -95,7 +95,7 @@
   },
   "taux-horaire-comptable/index.html": {
    "taille": 4797,
-   "sha256": "da9cedfca03a015bd96aa38e9be289aec765af754fd7180abad6db8e9dd0aea0"
+   "sha256": "f9669b47c33f4ed23b762012aa11064429bf83a4ebdef2e8aabc495d3bdd4cb0"
   }
  }
 }
