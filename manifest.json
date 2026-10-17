@@ -1,0 +1,101 @@
+{
+ "site": "Prix Net Réel — édition gratuite",
+ "fichiers": {
+  "404.html": {
+   "taille": 2978,
+   "sha256": "7d438376514862e0715ebcc7e4b28b4c3c125af0d457c661a00b80aaa3c8b76e"
+  },
+  "_headers": {
+   "taille": 262,
+   "sha256": "14277edbcd05893fa3599d39f0ace95f1bc3be6ed2be160350dfd1584c01363d"
+  },
+  "_redirects": {
+   "taille": 83,
+   "sha256": "d42a4fb82ef2cc7dca14a7be7cf88b988124f7025b27dfa5c76810da7263b881"
+  },
+  "assets/app.css": {
+   "taille": 22541,
+   "sha256": "2b979ab6654a85232577fa5fe211b8ebc81cf47c9c8fe69fe98bc80199d96f4d"
+  },
+  "assets/app.js": {
+   "taille": 137592,
+   "sha256": "324cfb6bbf1e0a0060e20fcb85bb51537a68f95f0dd6f46fbef1c1cdfd7cc5d2"
+  },
+  "assets/pdf-lib.LICENSE.md": {
+   "taille": 1070,
+   "sha256": "f2c9fc00fdb66eb99ac156ba52d734af66d8d309f65753ae809ad34ee2883bcb"
+  },
+  "assets/pdf-lib.min.js": {
+   "taille": 525099,
+   "sha256": "0f9a5cad07941f0826586c94e089d89b918c46e5c17cf2d5a3c6f666e3bc694f"
+  },
+  "calcul-prix-au-m2/index.html": {
+   "taille": 5839,
+   "sha256": "d6ae15620070e500c4f6f73ef5f502ac47e6f47f39ec33ad15f23f61ed11303e"
+  },
+  "calcul-prix-de-revient/index.html": {
+   "taille": 6048,
+   "sha256": "3b85b054ff5ab3272deb8d8afeeaa5da6cf1454e82e18b20dcf510857f173d3c"
+  },
+  "calcul-taux-horaire-independant/index.html": {
+   "taille": 5807,
+   "sha256": "c03a8bbc2b9cf9913de4f5974fac682f8a8d8e950b8693440c08c27487f32596"
+  },
+  "cgv/index.html": {
+   "taille": 4245,
+   "sha256": "53c1f88340cc2e453a8f017e39e21b7e08cbff4b3562c9e2be62040d799eae65"
+  },
+  "confidentialite/index.html": {
+   "taille": 4822,
+   "sha256": "f218e932eb75e17d9918dad7140329de8e11c911e1399abd3db1545d12d8ef3c"
+  },
+  "favicon.svg": {
+   "taille": 249,
+   "sha256": "7276b952b8f9a8bb42f589b330cdb950006f10ad6470d7d9e12ab261db388012"
+  },
+  "guides/index.html": {
+   "taille": 4365,
+   "sha256": "c5ad6b5cc3679550974e2271cf1199695206433d9c25023e3865d0b2a6f489bc"
+  },
+  "heures-facturables/index.html": {
+   "taille": 4733,
+   "sha256": "68f024075cc284132b86a58f20c21e0f026f34450e1d1eea2323429e2c969aad"
+  },
+  "index.html": {
+   "taille": 23097,
+   "sha256": "dd1c6ee0be715426cbd6055bc4c660b7b8bf4d3d5f2a18b7f954466506b50cb8"
+  },
+  "mentions-legales/index.html": {
+   "taille": 3711,
+   "sha256": "f0c178821f3d33e1003f6ff2aee8aee3474ed0a103b00af679c2f8296df57459"
+  },
+  "prix-au-m2-toiture/index.html": {
+   "taille": 5514,
+   "sha256": "2913c772b2719694fc2d4c3f83f097a118158f2b4fe243371fd67d51a2a7a1c6"
+  },
+  "prix-de-revient-au-kilo/index.html": {
+   "taille": 5693,
+   "sha256": "32eeebd88f95e2104b143409f9f0f034f29e93142598b982684d1050f7e96db6"
+  },
+  "prix-de-revient-pain/index.html": {
+   "taille": 5186,
+   "sha256": "e953294db128c4b10331e5b0a620765082adf9d674f0d7594eca6df1c1afacb1"
+  },
+  "rendement-chantier/index.html": {
+   "taille": 4976,
+   "sha256": "b7419af21305b14352db6d5dc17cabaa06d98bfd9e206dc0874da8b3e3a30f13"
+  },
+  "robots.txt": {
+   "taille": 85,
+   "sha256": "4dc90faf209b3821b2b48c0e6deaa982829754303554dda7f4e4b0cdbfa238b6"
+  },
+  "sitemap.xml": {
+   "taille": 1283,
+   "sha256": "7f77b616d6c00890cc8749ae480719ae4ad92ad8fc1dc69c90b494427b5f0976"
+  },
+  "taux-horaire-comptable/index.html": {
+   "taille": 4797,
+   "sha256": "da9cedfca03a015bd96aa38e9be289aec765af754fd7180abad6db8e9dd0aea0"
+  }
+ }
+}
