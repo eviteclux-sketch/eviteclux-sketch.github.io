@@ -1234,7 +1234,9 @@ var VID = (function(){
   lsSet('pnr-visiteur', v); return v;
 })();
 // messages du serveur affichés dans la langue de la page (le serveur répond en français)
-var SRV_MSG = {quota: '你的 2 次免费计算已用完。', auth: '输入你的访问码，即可使用助手。', limit: '本月使用次数已达上限。计数会在每月 1 日清零。', busy: '现在使用助手的人很多。请稍后再试。', upstream: '助手暂时没有响应。请稍后再试。', config: '助手暂时无法使用。', rate: '尝试次数过多。请过几分钟再试。', code: '访问码无效。'};
+var SRV_MSG = {quota: '你的 2 次免费计算已用完。', auth: '输入你的访问码，即可使用助手。', limit: '本月使用次数已达上限。计数会在每月 1 日清零。', busy: '现在使用助手的人很多。请稍后再试。', upstream: '助手暂时没有响应。请稍后再试。', config: '助手暂时无法使用。', rate: '尝试次数过多。请过几分钟再试。', code: '访问码无效。', ia: '助手暂时无法使用。你没有被扣款。请稍后再试。', deja: '这笔付款已经开通过访问权限。在其他设备上，请输入你的个人访问码。', paiement: '付款未能确认。请稍后再试。', fini: '你的订阅已失效。重新订阅即可继续使用助手。', pay: '暂时无法付款。'};
+var NEW_CODE = null;
+function pageLang(){ return document.documentElement.lang || 'fr'; }
 function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
 function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' / 月' : (ACC && ACC.price) || ''; }
 function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? '如需继续，请订阅 ' + priceLabel() + '，无最低期限。' : '价格为 ' + priceLabel() + ' 的订阅即将开通。你有访问码吗？请在下方输入。'); }
@@ -1258,6 +1260,21 @@ function accountLine(){
 function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'AI 助手即将上线。在此之前，完整计算、PDF 和计算对比都是免费的。'); $('#a-note').textContent = 'AI 助手将按月订阅提供。'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
+  // retour de Stripe après paiement : on ouvre l'accès, puis on recharge l'état
+  var aboId = q.get('abo');
+  if (aboId){
+    q.delete('abo');
+    try { history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash); } catch(e){}
+    if (/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(aboId)){
+      $('#a-form').hidden = true; $('#a-chips').hidden = true;
+      api('/api/abo', {id: aboId}).then(function(r){
+        if (r.ok && r.jeton){ lsSet('pnr-session', r.jeton); NEW_CODE = r.code || null; }
+        else toast(srvMsg(r, '付款未能确认。请稍后再试。'));
+        siteStart();
+      }, function(){ toast('无法连接。请重试。'); siteStart(); });
+      return;
+    }
+  }
   if (q.get('bienvenue')) toast('订阅已激活。请提出你的第一个问题。');
   else if (q.get('connecte')) toast('你已登录。');
   else if (q.get('lien') === 'expire') toast('链接已过期或已被使用：请重新申请一个。');
@@ -1270,15 +1287,19 @@ function siteStart(){
     var R = m.ready || {ai: true, pay: true, email: true};
     if (priceLabel()) $('#a-price').textContent = priceLabel();
     if (m.visiteur) $('#a-note').textContent = '你的问题由 Claude（Anthropic）处理。你保存的计算保留在你的浏览器中。';
-    else if (m.limit) $('#a-note').textContent = (R.pay ? '订阅包含' : '受邀访问') + ' : 每月最多 ' + m.limit + ' 个问题。你的问题由 Claude（Anthropic）处理。你保存的计算保留在你的浏览器中。';
+    else if (m.limit) $('#a-note').textContent = (m.abonne ? '订阅包含' : '受邀访问') + ' : 每月最多 ' + m.limit + ' 个问题。你的问题由 Claude（Anthropic）处理。你保存的计算保留在你的浏览器中。';
     else if (R.code && !R.pay) $('#a-note').textContent = '测试期间，助手仅供受邀人员使用。你的问题由 Claude（Anthropic）处理。';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
+    var tp = $('#a-testpay');
+    if (!tp){ tp = document.createElement('p'); tp.id = 'a-testpay'; tp.className = 'small mute'; $('#a-sub').insertAdjacentElement('afterend', tp); }
+    tp.textContent = '测试模式付款：不会从任何真实银行卡扣款。'; tp.hidden = !(R.pay && R.pay_test);
     if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : '内测';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', '你好。告诉我你想算什么：一个产品、一个工程，还是你的小时费率。我会一个一个地问你问题，由计算引擎来算。');
+      if (NEW_CODE){ bubble('sys', '订阅已激活。你的个人访问码是 ' + NEW_CODE + '。请妥善保存：在其他设备上登录时需要用到它。'); NEW_CODE = null; }
       if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
     } else if (m.visiteur) showPay(quotaMsg());
     else if (!R.pay) showPay(R.code ? '助手正在内测，仅限受邀用户。输入你的访问码即可使用。' : '助手正在内测。如果你的邮箱已受邀，可以通过电子邮件接收登录链接。');
@@ -1291,7 +1312,7 @@ if (SITE){
   $('#a-sub').addEventListener('click', function(){
     var b = this, em = ($('#a-email').value || '').trim();
     b.disabled = true;
-    api('/api/checkout', em ? {email: em} : {}).then(function(r){ if (r.url) location.href = r.url; else { b.disabled = false; toast(r.message || '暂时无法付款。'); } }, function(){ b.disabled = false; toast('无法连接。请重试。'); });
+    api('/api/checkout', em ? {email: em, lang: pageLang()} : {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else if (r.deja) siteStart(); else { b.disabled = false; toast(srvMsg(r, '暂时无法付款。')); } }, function(){ b.disabled = false; toast('无法连接。请重试。'); });
   });
   $('#a-login').addEventListener('submit', function(e){
     e.preventDefault();
@@ -1314,7 +1335,7 @@ if (SITE){
   $('#a-account').addEventListener('click', function(e){
     var b = e.target.closest('[data-acc]'); if (!b) return;
     if (b.dataset.acc === 'logout') api('/api/logout', {}).then(function(){ lsSet('pnr-session', null); location.reload(); }, function(){ lsSet('pnr-session', null); location.reload(); });
-    else api('/api/portal', {}).then(function(r){ if (r.url) location.href = r.url; else toast(r.message || '订阅管理页面暂时无法使用。'); });
+    else api('/api/portal', {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else toast(srvMsg(r, '订阅管理页面暂时无法使用。')); });
   });
 }
 var TOOLMAP = null;

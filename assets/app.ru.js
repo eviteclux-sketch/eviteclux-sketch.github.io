@@ -1234,7 +1234,9 @@ var VID = (function(){
   lsSet('pnr-visiteur', v); return v;
 })();
 // messages du serveur affichés dans la langue de la page (le serveur répond en français)
-var SRV_MSG = {quota: 'Вы использовали 2 бесплатных расчёта.', auth: 'Введите код доступа, чтобы пользоваться ассистентом.', limit: 'Месячный лимит использования исчерпан. Счётчик обнуляется 1-го числа каждого месяца.', busy: 'Сейчас к ассистенту очень много обращений. Попробуйте ещё раз чуть позже.', upstream: 'Ассистент сейчас не отвечает. Попробуйте ещё раз чуть позже.', config: 'Ассистент сейчас недоступен.', rate: 'Слишком много попыток. Попробуйте снова через несколько минут.', code: 'Неверный код доступа.'};
+var SRV_MSG = {quota: 'Вы использовали 2 бесплатных расчёта.', auth: 'Введите код доступа, чтобы пользоваться ассистентом.', limit: 'Месячный лимит использования исчерпан. Счётчик обнуляется 1-го числа каждого месяца.', busy: 'Сейчас к ассистенту очень много обращений. Попробуйте ещё раз чуть позже.', upstream: 'Ассистент сейчас не отвечает. Попробуйте ещё раз чуть позже.', config: 'Ассистент сейчас недоступен.', rate: 'Слишком много попыток. Попробуйте снова через несколько минут.', code: 'Неверный код доступа.', ia: 'Ассистент временно недоступен. С вас ничего не списано. Попробуйте ещё раз позже.', deja: 'По этой оплате доступ уже открыт. На другом устройстве введите свой персональный код доступа.', paiement: 'Не удалось подтвердить оплату. Попробуйте ещё раз чуть позже.', fini: 'Ваша подписка больше не активна. Оформите её снова, чтобы вернуться к ассистенту.', pay: 'Оплата сейчас недоступна.'};
+var NEW_CODE = null;
+function pageLang(){ return document.documentElement.lang || 'fr'; }
 function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
 function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' в месяц' : (ACC && ACC.price) || ''; }
 function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? 'Продолжить можно по подписке: ' + priceLabel() + ', без обязательств.' : 'Подписка за ' + priceLabel() + ' откроется совсем скоро. Есть код доступа? Введите его ниже.'); }
@@ -1258,6 +1260,21 @@ function accountLine(){
 function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'ИИ-ассистент скоро появится. А пока полный расчёт, PDF и сравнение ваших расчётов — бесплатно.'); $('#a-note').textContent = 'ИИ-ассистент будет доступен по ежемесячной подписке.'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
+  // retour de Stripe après paiement : on ouvre l'accès, puis on recharge l'état
+  var aboId = q.get('abo');
+  if (aboId){
+    q.delete('abo');
+    try { history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash); } catch(e){}
+    if (/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(aboId)){
+      $('#a-form').hidden = true; $('#a-chips').hidden = true;
+      api('/api/abo', {id: aboId}).then(function(r){
+        if (r.ok && r.jeton){ lsSet('pnr-session', r.jeton); NEW_CODE = r.code || null; }
+        else toast(srvMsg(r, 'Не удалось подтвердить оплату. Попробуйте ещё раз чуть позже.'));
+        siteStart();
+      }, function(){ toast('Не удалось войти. Попробуйте ещё раз.'); siteStart(); });
+      return;
+    }
+  }
   if (q.get('bienvenue')) toast('Подписка активирована. Задайте первый вопрос.');
   else if (q.get('connecte')) toast('Вы вошли в систему.');
   else if (q.get('lien') === 'expire') toast('Ссылка устарела или уже использована: запросите новую.');
@@ -1270,15 +1287,19 @@ function siteStart(){
     var R = m.ready || {ai: true, pay: true, email: true};
     if (priceLabel()) $('#a-price').textContent = priceLabel();
     if (m.visiteur) $('#a-note').textContent = 'Ваши вопросы обрабатывает Claude (Anthropic). Сохранённые расчёты остаются в вашем браузере.';
-    else if (m.limit) $('#a-note').textContent = (R.pay ? 'Входит в подписку' : 'Доступ по приглашению') + ' — до ' + m.limit + ' вопросов в месяц. Ваши вопросы обрабатывает Claude (Anthropic). Сохранённые расчёты остаются в вашем браузере.';
+    else if (m.limit) $('#a-note').textContent = (m.abonne ? 'Входит в подписку' : 'Доступ по приглашению') + ' — до ' + m.limit + ' вопросов в месяц. Ваши вопросы обрабатывает Claude (Anthropic). Сохранённые расчёты остаются в вашем браузере.';
     else if (R.code && !R.pay) $('#a-note').textContent = 'На время теста ассистент доступен только приглашённым. Ваши вопросы обрабатывает Claude (Anthropic).';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
+    var tp = $('#a-testpay');
+    if (!tp){ tp = document.createElement('p'); tp.id = 'a-testpay'; tp.className = 'small mute'; $('#a-sub').insertAdjacentElement('afterend', tp); }
+    tp.textContent = 'Оплата в тестовом режиме: с реальных карт ничего не списывается.'; tp.hidden = !(R.pay && R.pay_test);
     if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : 'Закрытый тест';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', 'Здравствуйте. Скажите, что нужно рассчитать: продукт, объект или вашу почасовую ставку. Я задам вопросы по одному, а считать будет расчётный модуль.');
+      if (NEW_CODE){ bubble('sys', 'Подписка активирована. Ваш персональный код доступа: ' + NEW_CODE + '. Сохраните его: он нужен, чтобы входить с другого устройства.'); NEW_CODE = null; }
       if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
     } else if (m.visiteur) showPay(quotaMsg());
     else if (!R.pay) showPay(R.code ? 'Ассистент проходит закрытый тест по приглашениям. Чтобы им пользоваться, введите код доступа.' : 'Ассистент проходит закрытый тест. Если ваш адрес приглашён, получите ссылку для входа по e-mail.');
@@ -1291,7 +1312,7 @@ if (SITE){
   $('#a-sub').addEventListener('click', function(){
     var b = this, em = ($('#a-email').value || '').trim();
     b.disabled = true;
-    api('/api/checkout', em ? {email: em} : {}).then(function(r){ if (r.url) location.href = r.url; else { b.disabled = false; toast(r.message || 'Оплата сейчас недоступна.'); } }, function(){ b.disabled = false; toast('Не удалось войти. Попробуйте ещё раз.'); });
+    api('/api/checkout', em ? {email: em, lang: pageLang()} : {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else if (r.deja) siteStart(); else { b.disabled = false; toast(srvMsg(r, 'Оплата сейчас недоступна.')); } }, function(){ b.disabled = false; toast('Не удалось войти. Попробуйте ещё раз.'); });
   });
   $('#a-login').addEventListener('submit', function(e){
     e.preventDefault();
@@ -1314,7 +1335,7 @@ if (SITE){
   $('#a-account').addEventListener('click', function(e){
     var b = e.target.closest('[data-acc]'); if (!b) return;
     if (b.dataset.acc === 'logout') api('/api/logout', {}).then(function(){ lsSet('pnr-session', null); location.reload(); }, function(){ lsSet('pnr-session', null); location.reload(); });
-    else api('/api/portal', {}).then(function(r){ if (r.url) location.href = r.url; else toast(r.message || 'Личный кабинет подписки недоступен.'); });
+    else api('/api/portal', {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else toast(srvMsg(r, 'Личный кабинет подписки недоступен.')); });
   });
 }
 var TOOLMAP = null;

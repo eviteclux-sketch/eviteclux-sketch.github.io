@@ -1234,7 +1234,9 @@ var VID = (function(){
   lsSet('pnr-visiteur', v); return v;
 })();
 // messages du serveur affichés dans la langue de la page (le serveur répond en français)
-var SRV_MSG = {quota: 'Tes 2 calculs offerts sont utilisés.', auth: 'Entre ton code d’accès pour utiliser l’assistant.', limit: 'Limite d’utilisation du mois atteinte. Le compteur repart le 1er du mois.', busy: 'L’assistant est très demandé. Réessaie dans un instant.', upstream: 'L’assistant ne répond pas pour le moment. Réessaie dans un instant.', config: 'L’assistant est indisponible pour le moment.', rate: 'Trop d’essais. Réessaie dans quelques minutes.', code: 'Code d’accès invalide.'};
+var SRV_MSG = {quota: 'Tes 2 calculs offerts sont utilisés.', auth: 'Entre ton code d’accès pour utiliser l’assistant.', limit: 'Limite d’utilisation du mois atteinte. Le compteur repart le 1er du mois.', busy: 'L’assistant est très demandé. Réessaie dans un instant.', upstream: 'L’assistant ne répond pas pour le moment. Réessaie dans un instant.', config: 'L’assistant est indisponible pour le moment.', rate: 'Trop d’essais. Réessaie dans quelques minutes.', code: 'Code d’accès invalide.', ia: 'L’assistant est momentanément indisponible. Aucun paiement n’a été pris. Réessaie plus tard.', deja: 'Ce paiement a déjà ouvert un accès. Sur un autre appareil, entre ton code d’accès personnel.', paiement: 'Le paiement n’a pas pu être confirmé. Réessaie dans un instant.', fini: 'Ton abonnement n’est plus actif. Réabonne-toi pour reprendre l’assistant.', pay: 'Paiement indisponible pour le moment.'};
+var NEW_CODE = null;
+function pageLang(){ return document.documentElement.lang || 'fr'; }
 function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
 function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' par mois' : (ACC && ACC.price) || ''; }
 function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? 'Continue avec l’abonnement : ' + priceLabel() + ', sans engagement.' : 'L’abonnement à ' + priceLabel() + ' ouvre très bientôt. Tu as un code d’accès ? Entre-le ci-dessous.'); }
@@ -1258,6 +1260,21 @@ function accountLine(){
 function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'L’assistant IA arrive bientôt. En attendant, le calcul complet, le PDF et la comparaison de tes calculs sont gratuits.'); $('#a-note').textContent = 'L’assistant IA sera proposé sur abonnement mensuel.'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
+  // retour de Stripe après paiement : on ouvre l'accès, puis on recharge l'état
+  var aboId = q.get('abo');
+  if (aboId){
+    q.delete('abo');
+    try { history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash); } catch(e){}
+    if (/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(aboId)){
+      $('#a-form').hidden = true; $('#a-chips').hidden = true;
+      api('/api/abo', {id: aboId}).then(function(r){
+        if (r.ok && r.jeton){ lsSet('pnr-session', r.jeton); NEW_CODE = r.code || null; }
+        else toast(srvMsg(r, 'Le paiement n’a pas pu être confirmé. Réessaie dans un instant.'));
+        siteStart();
+      }, function(){ toast('Connexion impossible. Réessaie.'); siteStart(); });
+      return;
+    }
+  }
   if (q.get('bienvenue')) toast('Abonnement activé. Pose ta première question.');
   else if (q.get('connecte')) toast('Tu es connecté.');
   else if (q.get('lien') === 'expire') toast('Lien expiré ou déjà utilisé : demandes-en un nouveau.');
@@ -1270,15 +1287,19 @@ function siteStart(){
     var R = m.ready || {ai: true, pay: true, email: true};
     if (priceLabel()) $('#a-price').textContent = priceLabel();
     if (m.visiteur) $('#a-note').textContent = 'Tes questions sont traitées par Claude (Anthropic). Tes calculs enregistrés restent dans ton navigateur.';
-    else if (m.limit) $('#a-note').textContent = (R.pay ? 'Inclus dans l’abonnement' : 'Accès sur invitation') + ' : jusqu’à ' + m.limit + ' questions par mois. Tes questions sont traitées par Claude (Anthropic). Tes calculs enregistrés restent dans ton navigateur.';
+    else if (m.limit) $('#a-note').textContent = (m.abonne ? 'Inclus dans l’abonnement' : 'Accès sur invitation') + ' : jusqu’à ' + m.limit + ' questions par mois. Tes questions sont traitées par Claude (Anthropic). Tes calculs enregistrés restent dans ton navigateur.';
     else if (R.code && !R.pay) $('#a-note').textContent = 'Pendant le test, l’assistant est réservé aux personnes invitées. Tes questions sont traitées par Claude (Anthropic).';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
+    var tp = $('#a-testpay');
+    if (!tp){ tp = document.createElement('p'); tp.id = 'a-testpay'; tp.className = 'small mute'; $('#a-sub').insertAdjacentElement('afterend', tp); }
+    tp.textContent = 'Paiement en mode test : aucune carte réelle n’est débitée.'; tp.hidden = !(R.pay && R.pay_test);
     if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : 'Test privé';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', 'Salut. Dis-moi ce que tu veux chiffrer : un produit, un chantier ou ton taux horaire. Je te pose les questions une par une, et c’est le moteur qui calcule.');
+      if (NEW_CODE){ bubble('sys', 'Abonnement activé. Ton code d’accès personnel : ' + NEW_CODE + '. Garde-le : il sert à te connecter sur un autre appareil.'); NEW_CODE = null; }
       if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
     } else if (m.visiteur) showPay(quotaMsg());
     else if (!R.pay) showPay(R.code ? 'L’assistant est en test privé, sur invitation. Entre ton code d’accès pour l’utiliser.' : 'L’assistant est en test privé. Si ton adresse est invitée, reçois ton lien de connexion par e-mail.');
@@ -1291,7 +1312,7 @@ if (SITE){
   $('#a-sub').addEventListener('click', function(){
     var b = this, em = ($('#a-email').value || '').trim();
     b.disabled = true;
-    api('/api/checkout', em ? {email: em} : {}).then(function(r){ if (r.url) location.href = r.url; else { b.disabled = false; toast(r.message || 'Paiement indisponible pour le moment.'); } }, function(){ b.disabled = false; toast('Connexion impossible. Réessaie.'); });
+    api('/api/checkout', em ? {email: em, lang: pageLang()} : {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else if (r.deja) siteStart(); else { b.disabled = false; toast(srvMsg(r, 'Paiement indisponible pour le moment.')); } }, function(){ b.disabled = false; toast('Connexion impossible. Réessaie.'); });
   });
   $('#a-login').addEventListener('submit', function(e){
     e.preventDefault();
@@ -1314,7 +1335,7 @@ if (SITE){
   $('#a-account').addEventListener('click', function(e){
     var b = e.target.closest('[data-acc]'); if (!b) return;
     if (b.dataset.acc === 'logout') api('/api/logout', {}).then(function(){ lsSet('pnr-session', null); location.reload(); }, function(){ lsSet('pnr-session', null); location.reload(); });
-    else api('/api/portal', {}).then(function(r){ if (r.url) location.href = r.url; else toast(r.message || 'Espace d’abonnement indisponible.'); });
+    else api('/api/portal', {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else toast(srvMsg(r, 'Espace d’abonnement indisponible.')); });
   });
 }
 var TOOLMAP = null;

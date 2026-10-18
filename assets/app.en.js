@@ -1234,7 +1234,9 @@ var VID = (function(){
   lsSet('pnr-visiteur', v); return v;
 })();
 // messages du serveur affichés dans la langue de la page (le serveur répond en français)
-var SRV_MSG = {quota: 'You\'ve used your 2 free calculations.', auth: 'Enter your access code to use the assistant.', limit: 'Monthly usage limit reached. The counter resets on the 1st of the month.', busy: 'The assistant is in high demand. Try again in a moment.', upstream: 'The assistant isn\'t responding right now. Try again in a moment.', config: 'The assistant is unavailable right now.', rate: 'Too many attempts. Try again in a few minutes.', code: 'Invalid access code.'};
+var SRV_MSG = {quota: 'You\'ve used your 2 free calculations.', auth: 'Enter your access code to use the assistant.', limit: 'Monthly usage limit reached. The counter resets on the 1st of the month.', busy: 'The assistant is in high demand. Try again in a moment.', upstream: 'The assistant isn\'t responding right now. Try again in a moment.', config: 'The assistant is unavailable right now.', rate: 'Too many attempts. Try again in a few minutes.', code: 'Invalid access code.', ia: 'The assistant is temporarily unavailable. No payment has been taken. Try again later.', deja: 'This payment has already unlocked access. On another device, enter your personal access code.', paiement: 'The payment couldn\'t be confirmed. Try again in a moment.', fini: 'Your subscription is no longer active. Resubscribe to use the assistant again.', pay: 'Payment unavailable right now.'};
+var NEW_CODE = null;
+function pageLang(){ return document.documentElement.lang || 'fr'; }
 function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
 function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' a month' : (ACC && ACC.price) || ''; }
 function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? 'Keep going with the subscription: ' + priceLabel() + ', no commitment.' : 'The subscription at ' + priceLabel() + ' opens very soon. Got an access code? Enter it below.'); }
@@ -1258,6 +1260,21 @@ function accountLine(){
 function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'The AI assistant is coming soon. In the meantime, the full calculation, the PDF and the comparison of your calculations are free.'); $('#a-note').textContent = 'The AI assistant will be offered as a monthly subscription.'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
+  // retour de Stripe après paiement : on ouvre l'accès, puis on recharge l'état
+  var aboId = q.get('abo');
+  if (aboId){
+    q.delete('abo');
+    try { history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash); } catch(e){}
+    if (/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(aboId)){
+      $('#a-form').hidden = true; $('#a-chips').hidden = true;
+      api('/api/abo', {id: aboId}).then(function(r){
+        if (r.ok && r.jeton){ lsSet('pnr-session', r.jeton); NEW_CODE = r.code || null; }
+        else toast(srvMsg(r, 'The payment couldn\'t be confirmed. Try again in a moment.'));
+        siteStart();
+      }, function(){ toast('Can\'t sign in. Try again.'); siteStart(); });
+      return;
+    }
+  }
   if (q.get('bienvenue')) toast('Subscription activated. Ask your first question.');
   else if (q.get('connecte')) toast('You\'re signed in.');
   else if (q.get('lien') === 'expire') toast('Link expired or already used: request a new one.');
@@ -1270,15 +1287,19 @@ function siteStart(){
     var R = m.ready || {ai: true, pay: true, email: true};
     if (priceLabel()) $('#a-price').textContent = priceLabel();
     if (m.visiteur) $('#a-note').textContent = 'Your questions are processed by Claude (Anthropic). Your saved calculations stay in your browser.';
-    else if (m.limit) $('#a-note').textContent = (R.pay ? 'Included in the subscription' : 'Invitation-only access') + ' — up to ' + m.limit + ' questions per month. Your questions are processed by Claude (Anthropic). Your saved calculations stay in your browser.';
+    else if (m.limit) $('#a-note').textContent = (m.abonne ? 'Included in the subscription' : 'Invitation-only access') + ' — up to ' + m.limit + ' questions per month. Your questions are processed by Claude (Anthropic). Your saved calculations stay in your browser.';
     else if (R.code && !R.pay) $('#a-note').textContent = 'During the test, the assistant is reserved for invited people. Your questions are processed by Claude (Anthropic).';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
+    var tp = $('#a-testpay');
+    if (!tp){ tp = document.createElement('p'); tp.id = 'a-testpay'; tp.className = 'small mute'; $('#a-sub').insertAdjacentElement('afterend', tp); }
+    tp.textContent = 'Payment in test mode: no real card is charged.'; tp.hidden = !(R.pay && R.pay_test);
     if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : 'Private test';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', 'Hi. Tell me what you want to price: a product, a job or your hourly rate. I\'ll ask you the questions one at a time, and the engine does the calculating.');
+      if (NEW_CODE){ bubble('sys', 'Subscription activated. Your personal access code: ' + NEW_CODE + '. Keep it: you\'ll need it to sign in on another device.'); NEW_CODE = null; }
       if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
     } else if (m.visiteur) showPay(quotaMsg());
     else if (!R.pay) showPay(R.code ? 'The assistant is in a private test, by invitation. Enter your access code to use it.' : 'The assistant is in a private test. If your address is invited, get your sign-in link by email.');
@@ -1291,7 +1312,7 @@ if (SITE){
   $('#a-sub').addEventListener('click', function(){
     var b = this, em = ($('#a-email').value || '').trim();
     b.disabled = true;
-    api('/api/checkout', em ? {email: em} : {}).then(function(r){ if (r.url) location.href = r.url; else { b.disabled = false; toast(r.message || 'Payment unavailable right now.'); } }, function(){ b.disabled = false; toast('Can\'t sign in. Try again.'); });
+    api('/api/checkout', em ? {email: em, lang: pageLang()} : {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else if (r.deja) siteStart(); else { b.disabled = false; toast(srvMsg(r, 'Payment unavailable right now.')); } }, function(){ b.disabled = false; toast('Can\'t sign in. Try again.'); });
   });
   $('#a-login').addEventListener('submit', function(e){
     e.preventDefault();
@@ -1314,7 +1335,7 @@ if (SITE){
   $('#a-account').addEventListener('click', function(e){
     var b = e.target.closest('[data-acc]'); if (!b) return;
     if (b.dataset.acc === 'logout') api('/api/logout', {}).then(function(){ lsSet('pnr-session', null); location.reload(); }, function(){ lsSet('pnr-session', null); location.reload(); });
-    else api('/api/portal', {}).then(function(r){ if (r.url) location.href = r.url; else toast(r.message || 'Subscription area unavailable.'); });
+    else api('/api/portal', {lang: pageLang()}).then(function(r){ if (r.url) location.href = r.url; else toast(srvMsg(r, 'Subscription area unavailable.')); });
   });
 }
 var TOOLMAP = null;
