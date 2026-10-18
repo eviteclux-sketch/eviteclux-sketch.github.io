@@ -296,6 +296,8 @@ function armed(btn, label){ if (btn.dataset.armed === '1'){ btn.dataset.armed = 
 var VIEWS = ['accueil', 'tests', 'calcul', 'assistant', 'calculs', 'guides'];
 var current = 'accueil';
 function show(v){
+  var toChat = v === 'assistant';
+  if (v === 'assistant' || v === 'tests') v = 'accueil';
   if (VIEWS.indexOf(v) < 0) v = 'accueil';
   current = v;
   $$('[data-view]').forEach(function(s){ s.hidden = s.getAttribute('data-view') !== v; });
@@ -303,7 +305,9 @@ function show(v){
   $('#c-mini').hidden = v !== 'calcul';
   if (v === 'calculs') renderSaved();
   window.scrollTo(0, 0);
+  if (toChat) focusChat();
 }
+function focusChat(){ var b = $('#a-box'), i = $('#a-input'); if (b) b.scrollIntoView({block: 'start'}); if (i && !i.closest('[hidden]')) setTimeout(function(){ try { i.focus({preventScroll: true}); } catch(e){} }, 60); }
 window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); });
 
 // ---------- accueil ----------
@@ -313,6 +317,10 @@ window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); 
     return '<li class="' + (x[3] ? 'sum' : '') + '"><div class="lab"><span>' + x[0] + '</span><span class="num">' + eur(x[1]) + '</span></div><div class="track"><i style="width:' + (x[1] / 75.20 * 100).toFixed(1) + '%;background:' + x[2] + ';animation-delay:' + (200 + i * 120) + 'ms"></i></div></li>';
   }).join('');
   $$('[data-open]').forEach(function(b){ b.addEventListener('click', function(){ setType(b.getAttribute('data-open')); location.hash = 'calcul'; }); });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-ask]'); if (!b) return;
+    e.preventDefault(); prepAsk(b.getAttribute('data-ask'), true);
+  });
 })();
 
 // ---------- tests rapides ----------
@@ -422,7 +430,7 @@ var CFG = {
   fabrication: {
     blocks: [
       {t: 'Ваш продукт', f: [F('unit', null, null, {kind: 'sel', o: [['pièce','шт'],['portion','порция'],['kg','kg'],['L','литр'],['lot','партия']]}), F('quantity', '@unit', 'Количество штук в партии или произведённые kg / литры, годные к продаже.', {req: 1}), F('price', '€/@unit', PRICE_HINT, {req: 1}), F('priceMode', null, null, {kind: 'sel', o: [['HT','Без НДС'],['TTC','С НДС']]}), F('country', null, null, {kind: 'sel', o: COUNTRY_OPTS}), F('vat', '%', 'Чтобы показать цены с НДС. Обязательно, если ваша цена указана с НДС. Проверьте ставку для вашего продукта.', {kind: 'vatpick'}), F('unsoldPercent', '%', 'Доля продукции, которую выбросили или отдали. Затраты распределяются на проданное.')]},
-      {t: 'Материалы', alt: {list: 'materials', lib: 1, out: 'cost', total: F('materialsTotal', '€', 'Стоимость материалов на ВСЮ партию, а не на единицу. Укажите 0, если их нет. Сюда можно включить энергию печи и упаковку.'), cols: [{k: 'name', l: 'Материал', text: 1}, {k: 'qty', l: 'Количество на партию'}, {k: 'u', l: 'Единица', sel: [['kg','kg'],['g','g'],['L','L'],['cl','cl'],['ml','ml'],['pièce','шт']]}, {k: 'price', l: 'Закупочная цена', s: '€/kg, L или шт.'}], calc: function(r){ return r.qty * (MAT_FACTOR[r.u] || 1) * r.price; }}},
+      {t: 'Материалы', alt: {list: 'materials', lib: 1, out: 'cost', total: F('materialsTotal', '€', 'Стоимость материалов на ВСЮ партию, а не на единицу. Укажите 0, если их нет. Сюда можно включить энергию печи и упаковку.'), cols: [{k: 'name', l: 'Материал', text: 1}, {k: 'qty', l: 'Количество на партию'}, {k: 'u', l: 'Единица', sel: [['kg','kg'],['g','g'],['L','L'],['cl','cl'],['ml','ml'],['pièce','шт']]}, {k: 'price', l: 'Закупочная цена', s: '€/kg, L или шт'}], calc: function(r){ return r.qty * (MAT_FACTOR[r.u] || 1) * r.price; }}},
       {t: 'Ваше время', f: [F('minutes', 'min', 'Общее время на всю партию.', {req: 1}), F('laborHourly', '€/h', 'Зарплата + социальные взносы за час работы. Аренда и энергия указываются ниже.', {req: 1})]}
     ],
     details: [
@@ -1073,6 +1081,16 @@ function renderSaved(){
 
 // ---------- assistant ----------
 var A = {sample: null, tools: false, turns: [], ctl: null, last: null};
+// début de question et exemple proposés selon le métier choisi
+var ASK_START = {fabrication: 'Я изготавливаю продукт и хочу узнать его реальную себестоимость и минимальную цену. ', travaux: 'Мне нужно рассчитать стоимость объекта за m², и я хочу узнать свою минимальную цену. ', services: 'Я хочу узнать свою реальную почасовую ставку и сколько часов мне нужно выставлять клиентам. '};
+var ASK_HINT = {fabrication: 'Напр.: 40 банок варенья за одну варку, 2 ч работы, 38 € на фрукты и сахар…', travaux: 'Напр.: черепичная кровля 180 m², бригада из 4 человек, беру 59 € за m²…', services: 'Напр.: бухгалтер-фрилансер, 70 € в час, 40 ч в неделю…'};
+function prepAsk(type, fill){
+  var i = $('#a-input');
+  if (i && ASK_HINT[type]) i.placeholder = ASK_HINT[type];
+  if (i && fill && ASK_START[type] && !i.value.trim()) i.value = ASK_START[type];
+  var h = location.hash.slice(1);
+  if (h && h !== 'accueil' && h !== 'assistant') location.hash = 'assistant'; else focusChat();
+}
 function num_(v){ if (typeof v === 'number') return v; if (typeof v === 'string'){ var t = v.replace('%', '').trim(); var n = parseNum(t); return n === undefined || isNaN(n) ? v : n; } return v; }
 function coerce(o){
   var out = {};
@@ -1206,22 +1224,38 @@ function ask(text){
 function plainText(s){ return String(s || '').replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/__([^_\n]+)__/g, '$1').replace(/^#{1,6}\s+/gm, '').replace(/^(\s*)[*•]\s+/gm, '$1– ').trim(); }
 // ---------- assistant sur le site web : abonnement, connexion, serveur ----------
 var ACC = null;
+var metierQ = new URLSearchParams(location.search).get('metier');
+var VID = (function(){
+  var v = lsGet('pnr-visiteur');
+  if (typeof v === 'string' && /^[A-Za-z0-9_-]{16,64}$/.test(v)) return v;
+  var a = new Uint8Array(18);
+  try { crypto.getRandomValues(a); } catch(e){ for (var i = 0; i < 18; i++) a[i] = Math.floor(Math.random() * 256); }
+  v = btoa(String.fromCharCode.apply(null, a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  lsSet('pnr-visiteur', v); return v;
+})();
+// messages du serveur affichés dans la langue de la page (le serveur répond en français)
+var SRV_MSG = {quota: 'Вы использовали 2 бесплатных расчёта.', auth: 'Введите код доступа, чтобы пользоваться ассистентом.', limit: 'Месячный лимит использования исчерпан. Счётчик обнуляется 1-го числа каждого месяца.', busy: 'Сейчас к ассистенту очень много обращений. Попробуйте ещё раз чуть позже.', upstream: 'Ассистент сейчас не отвечает. Попробуйте ещё раз чуть позже.', config: 'Ассистент сейчас недоступен.', rate: 'Слишком много попыток. Попробуйте снова через несколько минут.', code: 'Неверный код доступа.'};
+function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
+function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' в месяц' : (ACC && ACC.price) || ''; }
+function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? 'Продолжить можно по подписке: ' + priceLabel() + ', без обязательств.' : 'Подписка за ' + priceLabel() + ' откроется совсем скоро. Есть код доступа? Введите его ниже.'); }
 function api(path, body, signal){
   var h = body === undefined ? {} : {'content-type': 'application/json'}, jt = lsGet('pnr-session');
   if (jt) h['x-pnr-session'] = jt;
+  if (SITE) h['x-pnr-visiteur'] = VID;
   return fetch(path, {method: body === undefined ? 'GET' : 'POST', headers: h, body: body === undefined ? undefined : JSON.stringify(body), credentials: 'same-origin', signal: signal})
     .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ j.status_ = r.status; return j; }); });
 }
 function showPay(msg){ A.ready = false; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').hidden = !$('#a-thread').children.length; $('#a-pay').hidden = false; $('#a-pay-msg').textContent = msg || ''; }
 function accountLine(){
   var el = $('#a-account');
+  if (ACC && ACC.visiteur){ el.hidden = false; el.innerHTML = '<b>Бесплатные расчёты без регистрации: ' + ACC.cases_left + ' / ' + ACC.cases_max + '</b>'; return; }
   if (!ACC || !(ACC.email || ACC.nom)){ el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = 'Вы вошли: ' + esc(ACC.email || ACC.nom) +(ACC.free && ACC.active ? ' · бесплатный доступ' : '') + (ACC.active && ACC.limit ? ' · ' + ACC.used + ' / ' + ACC.limit + ' вопросов в этом месяце' : '') +
     (ACC.free ? '' : ' · <button class="linkbtn" type="button" data-acc="portal">Управлять подпиской</button>') + ' · <button class="linkbtn" type="button" data-acc="logout">Выйти</button>';
 }
 // site sans clé IA : l'assistant est annoncé, le reste du site marche normalement
-function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'ИИ-ассистент скоро появится. А пока быстрые тесты, полный расчёт, PDF и сравнение ваших расчётов — бесплатно.'); $('#a-note').textContent = 'ИИ-ассистент будет доступен по ежемесячной подписке.'; }
+function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'ИИ-ассистент скоро появится. А пока полный расчёт, PDF и сравнение ваших расчётов — бесплатно.'); $('#a-note').textContent = 'ИИ-ассистент будет доступен по ежемесячной подписке.'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
   if (q.get('bienvenue')) toast('Подписка активирована. Задайте первый вопрос.');
@@ -1234,17 +1268,20 @@ function siteStart(){
   api('/api/me').then(function(m){
     ACC = m;
     var R = m.ready || {ai: true, pay: true, email: true};
-    if (m.price) $('#a-price').textContent = m.price;
-    if (m.limit) $('#a-note').textContent = (R.pay ? 'Входит в подписку' : 'Доступ по приглашению') + ' — до ' + m.limit + ' вопросов в месяц. Ваши вопросы обрабатывает Claude (Anthropic). Сохранённые расчёты остаются в вашем браузере.';
+    if (priceLabel()) $('#a-price').textContent = priceLabel();
+    if (m.visiteur) $('#a-note').textContent = 'Ваши вопросы обрабатывает Claude (Anthropic). Сохранённые расчёты остаются в вашем браузере.';
+    else if (m.limit) $('#a-note').textContent = (R.pay ? 'Входит в подписку' : 'Доступ по приглашению') + ' — до ' + m.limit + ' вопросов в месяц. Ваши вопросы обрабатывает Claude (Anthropic). Сохранённые расчёты остаются в вашем браузере.';
     else if (R.code && !R.pay) $('#a-note').textContent = 'На время теста ассистент доступен только приглашённым. Ваши вопросы обрабатывает Claude (Anthropic).';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
-    if (!R.pay) $('#a-pay-kicker').textContent = 'Закрытый тест';
+    if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : 'Закрытый тест';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', 'Здравствуйте. Скажите, что нужно рассчитать: продукт, объект или вашу почасовую ставку. Я задам вопросы по одному, а считать будет расчётный модуль.');
-    } else if (!R.pay) showPay(R.code ? 'Ассистент проходит закрытый тест по приглашениям. Чтобы им пользоваться, введите код доступа.' : 'Ассистент проходит закрытый тест. Если ваш адрес приглашён, получите ссылку для входа по e-mail.');
+      if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
+    } else if (m.visiteur) showPay(quotaMsg());
+    else if (!R.pay) showPay(R.code ? 'Ассистент проходит закрытый тест по приглашениям. Чтобы им пользоваться, введите код доступа.' : 'Ассистент проходит закрытый тест. Если ваш адрес приглашён, получите ссылку для входа по e-mail.');
     else if (m.email) showPay('Ваша подписка больше не активна. Оформите её снова, чтобы вернуться к ассистенту.');
     else showPay('Опишите свой объект, продукт или заказ своими словами: ассистент задаст нужные вопросы, а расчётный модуль посчитает вашу реальную цену.');
   }, function(){ showPay('Сервер сейчас не отвечает. Тесты и полный расчёт всё равно работают.'); });
@@ -1269,7 +1306,7 @@ if (SITE){
     b.disabled = true;
     api('/api/code', {code: c}).then(function(r){
       b.disabled = false;
-      if (!r.ok){ toast(r.message || 'Неверный код доступа.'); return; }
+      if (!r.ok){ toast(srvMsg(r, 'Неверный код доступа.')); return; }
       if (r.jeton) lsSet('pnr-session', r.jeton);
       $('#a-code-in').value = ''; $('#a-thread').innerHTML = ''; toast('Доступ открыт. Задайте первый вопрос.'); siteStart();
     }, function(){ b.disabled = false; toast('Не удалось войти. Попробуйте ещё раз.'); });
@@ -1312,7 +1349,7 @@ function askSite(text){
       var txt = r.content.filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
       txt = plainText(txt);
       if (txt){ if (out){ out.textContent = txt; out = null; } else bubble('ai', txt); }
-      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; accountLine(); }
+      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; if (ACC.visiteur){ ACC.cases_used = r.usage.cases_used; ACC.cases_left = r.usage.cases_left; } accountLine(); }
       var hasTool = r.content.some(function(b){ return b.type === 'tool_use'; });
       if (hasTool && (r.stop_reason !== 'tool_use' || rounds >= 5)){
         // appel d'outil coupé ou trop d'étapes : on retire l'échange pour garder une conversation valide
@@ -1331,6 +1368,7 @@ function askSite(text){
       }
       if (out){ out.remove(); out = null; }
       if (r.stop_reason === 'max_tokens') bubble('sys', 'Ответ обрезан: задайте вопрос покороче.');
+      if (ACC && ACC.visiteur && ACC.cases_left === 0 && !A.lastFree){ A.lastFree = true; bubble('sys', 'Это был ваш последний бесплатный расчёт: его ещё можно уточнить здесь. Для нового расчёта понадобится подписка.'); }
       setStatus('');
     });
   }
@@ -1338,11 +1376,19 @@ function askSite(text){
     if (out) out.remove();
     A.turns = before;
     if (e && e.name === 'AbortError'){ setStatus('Остановлено.'); return; }
-    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(e.message); return; }
+    if (e && e.error === 'quota'){ setStatus(''); if (ACC){ ACC.cases_left = 0; ACC.active = false; accountLine(); } showPay(quotaMsg()); return; }
+    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(srvMsg(e)); return; }
     if (e && e.error === 'bad_request'){ A.turns = []; A.last = null; bubble('sys', 'Новый разговор: предыдущий был слишком длинным. Задайте вопрос ещё раз.'); setStatus(''); return; }
-    setStatus((e && e.message) || 'Ответ прервался. Попробуйте ещё раз.');
-  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; });
+    setStatus(srvMsg(e, 'Ответ прервался. Попробуйте ещё раз.'));
+  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; $('#a-new').hidden = !A.turns.length || !A.ready; });
 }
+// nouveau calcul : nouvelle conversation (pour un visiteur, c'est un nouveau calcul offert)
+$('#a-new').addEventListener('click', function(){
+  if (A.ctl) return;
+  A.turns = []; A.last = null; A.lastFree = false; $('#a-thread').innerHTML = ''; this.hidden = true;
+  bubble('ai', 'Здравствуйте. Скажите, что нужно рассчитать: продукт, объект или вашу почасовую ставку. Я задам вопросы по одному, а считать будет расчётный модуль.');
+  $('#a-chips').hidden = false; focusChat();
+});
 $('#a-form').addEventListener('submit', function(e){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); });
 $('#a-input').addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); } });
 $('#a-stop').addEventListener('click', function(){ if (A.ctl) A.ctl.abort(); });
@@ -1355,7 +1401,7 @@ $('#g-list').innerHTML = GUIDES.map(function(g){
     '<h4>Пример с цифрами</h4><p>' + esc(g.example) + '</p>' + (g.extra ? '<p class="mute">' + esc(g.extra) + '</p>' : '') +
     (g.errors ? '<h4>Дорогие ошибки</h4><ol>' + g.errors.map(function(e){ return '<li>' + esc(e) + '</li>'; }).join('') + '</ol>' : '') +
     (g.faq ? g.faq.map(function(f){ return '<h4>' + esc(f[0]) + '</h4><p>' + esc(f[1]) + '</p>'; }).join('') : '') +
-    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#calcul" data-goto="' + g.type + '">Сделать свой расчёт</a></div></div></details>';
+    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#accueil" data-ask="' + g.type + '">Сделать свой расчёт</a></div></div></details>';
 }).join('');
 
 // ---------- exposé pour les tests automatiques ----------
@@ -1363,7 +1409,6 @@ window.__PNR_TEST = {coerce: coerce, guard: guard, compact: compact, openFromInp
 
 // ---------- démarrage ----------
 renderForm(); compute();
-var metierQ = new URLSearchParams(location.search).get('metier');
 if (metierQ && CFG[metierQ]) setType(metierQ);
 show(location.hash.slice(1) || 'accueil');
 })();

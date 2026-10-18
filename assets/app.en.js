@@ -296,6 +296,8 @@ function armed(btn, label){ if (btn.dataset.armed === '1'){ btn.dataset.armed = 
 var VIEWS = ['accueil', 'tests', 'calcul', 'assistant', 'calculs', 'guides'];
 var current = 'accueil';
 function show(v){
+  var toChat = v === 'assistant';
+  if (v === 'assistant' || v === 'tests') v = 'accueil';
   if (VIEWS.indexOf(v) < 0) v = 'accueil';
   current = v;
   $$('[data-view]').forEach(function(s){ s.hidden = s.getAttribute('data-view') !== v; });
@@ -303,7 +305,9 @@ function show(v){
   $('#c-mini').hidden = v !== 'calcul';
   if (v === 'calculs') renderSaved();
   window.scrollTo(0, 0);
+  if (toChat) focusChat();
 }
+function focusChat(){ var b = $('#a-box'), i = $('#a-input'); if (b) b.scrollIntoView({block: 'start'}); if (i && !i.closest('[hidden]')) setTimeout(function(){ try { i.focus({preventScroll: true}); } catch(e){} }, 60); }
 window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); });
 
 // ---------- accueil ----------
@@ -313,6 +317,10 @@ window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); 
     return '<li class="' + (x[3] ? 'sum' : '') + '"><div class="lab"><span>' + x[0] + '</span><span class="num">' + eur(x[1]) + '</span></div><div class="track"><i style="width:' + (x[1] / 75.20 * 100).toFixed(1) + '%;background:' + x[2] + ';animation-delay:' + (200 + i * 120) + 'ms"></i></div></li>';
   }).join('');
   $$('[data-open]').forEach(function(b){ b.addEventListener('click', function(){ setType(b.getAttribute('data-open')); location.hash = 'calcul'; }); });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-ask]'); if (!b) return;
+    e.preventDefault(); prepAsk(b.getAttribute('data-ask'), true);
+  });
 })();
 
 // ---------- tests rapides ----------
@@ -1073,6 +1081,16 @@ function renderSaved(){
 
 // ---------- assistant ----------
 var A = {sample: null, tools: false, turns: [], ctl: null, last: null};
+// début de question et exemple proposés selon le métier choisi
+var ASK_START = {fabrication: 'I make a product and I want to know my real cost price and my floor price. ', travaux: 'I need to price a job per m² and I want to know my floor price. ', services: 'I want to know my real hourly rate and the hours I need to bill. '};
+var ASK_HINT = {fabrication: 'E.g. 40 jars of jam per batch, 2 h of work, €38 of fruit and sugar…', travaux: 'E.g. 180 m² tiled roof, team of 4, I charge €59 per m²…', services: 'E.g. freelance accountant at €70 an hour, 40 h a week…'};
+function prepAsk(type, fill){
+  var i = $('#a-input');
+  if (i && ASK_HINT[type]) i.placeholder = ASK_HINT[type];
+  if (i && fill && ASK_START[type] && !i.value.trim()) i.value = ASK_START[type];
+  var h = location.hash.slice(1);
+  if (h && h !== 'accueil' && h !== 'assistant') location.hash = 'assistant'; else focusChat();
+}
 function num_(v){ if (typeof v === 'number') return v; if (typeof v === 'string'){ var t = v.replace('%', '').trim(); var n = parseNum(t); return n === undefined || isNaN(n) ? v : n; } return v; }
 function coerce(o){
   var out = {};
@@ -1206,22 +1224,38 @@ function ask(text){
 function plainText(s){ return String(s || '').replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/__([^_\n]+)__/g, '$1').replace(/^#{1,6}\s+/gm, '').replace(/^(\s*)[*•]\s+/gm, '$1– ').trim(); }
 // ---------- assistant sur le site web : abonnement, connexion, serveur ----------
 var ACC = null;
+var metierQ = new URLSearchParams(location.search).get('metier');
+var VID = (function(){
+  var v = lsGet('pnr-visiteur');
+  if (typeof v === 'string' && /^[A-Za-z0-9_-]{16,64}$/.test(v)) return v;
+  var a = new Uint8Array(18);
+  try { crypto.getRandomValues(a); } catch(e){ for (var i = 0; i < 18; i++) a[i] = Math.floor(Math.random() * 256); }
+  v = btoa(String.fromCharCode.apply(null, a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  lsSet('pnr-visiteur', v); return v;
+})();
+// messages du serveur affichés dans la langue de la page (le serveur répond en français)
+var SRV_MSG = {quota: 'You\'ve used your 2 free calculations.', auth: 'Enter your access code to use the assistant.', limit: 'Monthly usage limit reached. The counter resets on the 1st of the month.', busy: 'The assistant is in high demand. Try again in a moment.', upstream: 'The assistant isn\'t responding right now. Try again in a moment.', config: 'The assistant is unavailable right now.', rate: 'Too many attempts. Try again in a few minutes.', code: 'Invalid access code.'};
+function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
+function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' a month' : (ACC && ACC.price) || ''; }
+function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? 'Keep going with the subscription: ' + priceLabel() + ', no commitment.' : 'The subscription at ' + priceLabel() + ' opens very soon. Got an access code? Enter it below.'); }
 function api(path, body, signal){
   var h = body === undefined ? {} : {'content-type': 'application/json'}, jt = lsGet('pnr-session');
   if (jt) h['x-pnr-session'] = jt;
+  if (SITE) h['x-pnr-visiteur'] = VID;
   return fetch(path, {method: body === undefined ? 'GET' : 'POST', headers: h, body: body === undefined ? undefined : JSON.stringify(body), credentials: 'same-origin', signal: signal})
     .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ j.status_ = r.status; return j; }); });
 }
 function showPay(msg){ A.ready = false; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').hidden = !$('#a-thread').children.length; $('#a-pay').hidden = false; $('#a-pay-msg').textContent = msg || ''; }
 function accountLine(){
   var el = $('#a-account');
+  if (ACC && ACC.visiteur){ el.hidden = false; el.innerHTML = '<b>Free calculations left, no sign-up: ' + ACC.cases_left + ' / ' + ACC.cases_max + '</b>'; return; }
   if (!ACC || !(ACC.email || ACC.nom)){ el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = 'Signed in: ' + esc(ACC.email || ACC.nom) +(ACC.free && ACC.active ? ' · free access' : '') + (ACC.active && ACC.limit ? ' · ' + ACC.used + ' / ' + ACC.limit + ' questions this month' : '') +
     (ACC.free ? '' : ' · <button class="linkbtn" type="button" data-acc="portal">Manage my subscription</button>') + ' · <button class="linkbtn" type="button" data-acc="logout">Log out</button>';
 }
 // site sans clé IA : l'assistant est annoncé, le reste du site marche normalement
-function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'The AI assistant is coming soon. In the meantime, the quick tests, the full calculation, the PDF and the comparison of your calculations are free.'); $('#a-note').textContent = 'The AI assistant will be offered as a monthly subscription.'; }
+function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'The AI assistant is coming soon. In the meantime, the full calculation, the PDF and the comparison of your calculations are free.'); $('#a-note').textContent = 'The AI assistant will be offered as a monthly subscription.'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
   if (q.get('bienvenue')) toast('Subscription activated. Ask your first question.');
@@ -1234,17 +1268,20 @@ function siteStart(){
   api('/api/me').then(function(m){
     ACC = m;
     var R = m.ready || {ai: true, pay: true, email: true};
-    if (m.price) $('#a-price').textContent = m.price;
-    if (m.limit) $('#a-note').textContent = (R.pay ? 'Included in the subscription' : 'Invitation-only access') + ' — up to ' + m.limit + ' questions per month. Your questions are processed by Claude (Anthropic). Your saved calculations stay in your browser.';
+    if (priceLabel()) $('#a-price').textContent = priceLabel();
+    if (m.visiteur) $('#a-note').textContent = 'Your questions are processed by Claude (Anthropic). Your saved calculations stay in your browser.';
+    else if (m.limit) $('#a-note').textContent = (R.pay ? 'Included in the subscription' : 'Invitation-only access') + ' — up to ' + m.limit + ' questions per month. Your questions are processed by Claude (Anthropic). Your saved calculations stay in your browser.';
     else if (R.code && !R.pay) $('#a-note').textContent = 'During the test, the assistant is reserved for invited people. Your questions are processed by Claude (Anthropic).';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
-    if (!R.pay) $('#a-pay-kicker').textContent = 'Private test';
+    if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : 'Private test';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', 'Hi. Tell me what you want to price: a product, a job or your hourly rate. I\'ll ask you the questions one at a time, and the engine does the calculating.');
-    } else if (!R.pay) showPay(R.code ? 'The assistant is in a private test, by invitation. Enter your access code to use it.' : 'The assistant is in a private test. If your address is invited, get your sign-in link by email.');
+      if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
+    } else if (m.visiteur) showPay(quotaMsg());
+    else if (!R.pay) showPay(R.code ? 'The assistant is in a private test, by invitation. Enter your access code to use it.' : 'The assistant is in a private test. If your address is invited, get your sign-in link by email.');
     else if (m.email) showPay('Your subscription is no longer active. Resubscribe to use the assistant again.');
     else showPay('Describe your job, your product or your assignment in your own words: the assistant asks you the right questions and the engine works out your real price.');
   }, function(){ showPay('The server isn\'t responding right now. The tests and the full calculation still work.'); });
@@ -1269,7 +1306,7 @@ if (SITE){
     b.disabled = true;
     api('/api/code', {code: c}).then(function(r){
       b.disabled = false;
-      if (!r.ok){ toast(r.message || 'Invalid access code.'); return; }
+      if (!r.ok){ toast(srvMsg(r, 'Invalid access code.')); return; }
       if (r.jeton) lsSet('pnr-session', r.jeton);
       $('#a-code-in').value = ''; $('#a-thread').innerHTML = ''; toast('Access granted. Ask your first question.'); siteStart();
     }, function(){ b.disabled = false; toast('Can\'t sign in. Try again.'); });
@@ -1312,7 +1349,7 @@ function askSite(text){
       var txt = r.content.filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
       txt = plainText(txt);
       if (txt){ if (out){ out.textContent = txt; out = null; } else bubble('ai', txt); }
-      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; accountLine(); }
+      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; if (ACC.visiteur){ ACC.cases_used = r.usage.cases_used; ACC.cases_left = r.usage.cases_left; } accountLine(); }
       var hasTool = r.content.some(function(b){ return b.type === 'tool_use'; });
       if (hasTool && (r.stop_reason !== 'tool_use' || rounds >= 5)){
         // appel d'outil coupé ou trop d'étapes : on retire l'échange pour garder une conversation valide
@@ -1331,6 +1368,7 @@ function askSite(text){
       }
       if (out){ out.remove(); out = null; }
       if (r.stop_reason === 'max_tokens') bubble('sys', 'Answer cut off: ask a shorter question.');
+      if (ACC && ACC.visiteur && ACC.cases_left === 0 && !A.lastFree){ A.lastFree = true; bubble('sys', 'That was your last free calculation: you can still refine it here. For a new calculation, you\'ll need the subscription.'); }
       setStatus('');
     });
   }
@@ -1338,11 +1376,19 @@ function askSite(text){
     if (out) out.remove();
     A.turns = before;
     if (e && e.name === 'AbortError'){ setStatus('Stopped.'); return; }
-    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(e.message); return; }
+    if (e && e.error === 'quota'){ setStatus(''); if (ACC){ ACC.cases_left = 0; ACC.active = false; accountLine(); } showPay(quotaMsg()); return; }
+    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(srvMsg(e)); return; }
     if (e && e.error === 'bad_request'){ A.turns = []; A.last = null; bubble('sys', 'New conversation: the previous one was too long. Ask your question again.'); setStatus(''); return; }
-    setStatus((e && e.message) || 'The answer was interrupted. Try again.');
-  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; });
+    setStatus(srvMsg(e, 'The answer was interrupted. Try again.'));
+  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; $('#a-new').hidden = !A.turns.length || !A.ready; });
 }
+// nouveau calcul : nouvelle conversation (pour un visiteur, c'est un nouveau calcul offert)
+$('#a-new').addEventListener('click', function(){
+  if (A.ctl) return;
+  A.turns = []; A.last = null; A.lastFree = false; $('#a-thread').innerHTML = ''; this.hidden = true;
+  bubble('ai', 'Hi. Tell me what you want to price: a product, a job or your hourly rate. I\'ll ask you the questions one at a time, and the engine does the calculating.');
+  $('#a-chips').hidden = false; focusChat();
+});
 $('#a-form').addEventListener('submit', function(e){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); });
 $('#a-input').addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); } });
 $('#a-stop').addEventListener('click', function(){ if (A.ctl) A.ctl.abort(); });
@@ -1355,7 +1401,7 @@ $('#g-list').innerHTML = GUIDES.map(function(g){
     '<h4>Worked example</h4><p>' + esc(g.example) + '</p>' + (g.extra ? '<p class="mute">' + esc(g.extra) + '</p>' : '') +
     (g.errors ? '<h4>Mistakes that cost you</h4><ol>' + g.errors.map(function(e){ return '<li>' + esc(e) + '</li>'; }).join('') + '</ol>' : '') +
     (g.faq ? g.faq.map(function(f){ return '<h4>' + esc(f[0]) + '</h4><p>' + esc(f[1]) + '</p>'; }).join('') : '') +
-    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#calcul" data-goto="' + g.type + '">Do my calculation</a></div></div></details>';
+    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#accueil" data-ask="' + g.type + '">Do my calculation</a></div></div></details>';
 }).join('');
 
 // ---------- exposé pour les tests automatiques ----------
@@ -1363,7 +1409,6 @@ window.__PNR_TEST = {coerce: coerce, guard: guard, compact: compact, openFromInp
 
 // ---------- démarrage ----------
 renderForm(); compute();
-var metierQ = new URLSearchParams(location.search).get('metier');
 if (metierQ && CFG[metierQ]) setType(metierQ);
 show(location.hash.slice(1) || 'accueil');
 })();

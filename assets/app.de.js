@@ -296,6 +296,8 @@ function armed(btn, label){ if (btn.dataset.armed === '1'){ btn.dataset.armed = 
 var VIEWS = ['accueil', 'tests', 'calcul', 'assistant', 'calculs', 'guides'];
 var current = 'accueil';
 function show(v){
+  var toChat = v === 'assistant';
+  if (v === 'assistant' || v === 'tests') v = 'accueil';
   if (VIEWS.indexOf(v) < 0) v = 'accueil';
   current = v;
   $$('[data-view]').forEach(function(s){ s.hidden = s.getAttribute('data-view') !== v; });
@@ -303,7 +305,9 @@ function show(v){
   $('#c-mini').hidden = v !== 'calcul';
   if (v === 'calculs') renderSaved();
   window.scrollTo(0, 0);
+  if (toChat) focusChat();
 }
+function focusChat(){ var b = $('#a-box'), i = $('#a-input'); if (b) b.scrollIntoView({block: 'start'}); if (i && !i.closest('[hidden]')) setTimeout(function(){ try { i.focus({preventScroll: true}); } catch(e){} }, 60); }
 window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); });
 
 // ---------- accueil ----------
@@ -313,6 +317,10 @@ window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); 
     return '<li class="' + (x[3] ? 'sum' : '') + '"><div class="lab"><span>' + x[0] + '</span><span class="num">' + eur(x[1]) + '</span></div><div class="track"><i style="width:' + (x[1] / 75.20 * 100).toFixed(1) + '%;background:' + x[2] + ';animation-delay:' + (200 + i * 120) + 'ms"></i></div></li>';
   }).join('');
   $$('[data-open]').forEach(function(b){ b.addEventListener('click', function(){ setType(b.getAttribute('data-open')); location.hash = 'calcul'; }); });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-ask]'); if (!b) return;
+    e.preventDefault(); prepAsk(b.getAttribute('data-ask'), true);
+  });
 })();
 
 // ---------- tests rapides ----------
@@ -1073,6 +1081,16 @@ function renderSaved(){
 
 // ---------- assistant ----------
 var A = {sample: null, tools: false, turns: [], ctl: null, last: null};
+// début de question et exemple proposés selon le métier choisi
+var ASK_START = {fabrication: 'Ich stelle ein Produkt her und will meine echten Selbstkosten und meinen Mindestpreis kennen. ', travaux: 'Ich muss eine Baustelle pro m² kalkulieren und will meinen Mindestpreis kennen. ', services: 'Ich will meinen echten Stundensatz kennen und wissen, wie viele Stunden ich abrechnen muss. '};
+var ASK_HINT = {fabrication: 'Z. B. 40 Gläser Marmelade pro Charge, 2 h Arbeit, 38 € für Obst und Zucker…', travaux: 'Z. B. Ziegeldach mit 180 m², Team von 4, ich berechne 59 € pro m²…', services: 'Z. B. selbstständiger Buchhalter mit 70 € pro Stunde, 40 h pro Woche…'};
+function prepAsk(type, fill){
+  var i = $('#a-input');
+  if (i && ASK_HINT[type]) i.placeholder = ASK_HINT[type];
+  if (i && fill && ASK_START[type] && !i.value.trim()) i.value = ASK_START[type];
+  var h = location.hash.slice(1);
+  if (h && h !== 'accueil' && h !== 'assistant') location.hash = 'assistant'; else focusChat();
+}
 function num_(v){ if (typeof v === 'number') return v; if (typeof v === 'string'){ var t = v.replace('%', '').trim(); var n = parseNum(t); return n === undefined || isNaN(n) ? v : n; } return v; }
 function coerce(o){
   var out = {};
@@ -1206,22 +1224,38 @@ function ask(text){
 function plainText(s){ return String(s || '').replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/__([^_\n]+)__/g, '$1').replace(/^#{1,6}\s+/gm, '').replace(/^(\s*)[*•]\s+/gm, '$1– ').trim(); }
 // ---------- assistant sur le site web : abonnement, connexion, serveur ----------
 var ACC = null;
+var metierQ = new URLSearchParams(location.search).get('metier');
+var VID = (function(){
+  var v = lsGet('pnr-visiteur');
+  if (typeof v === 'string' && /^[A-Za-z0-9_-]{16,64}$/.test(v)) return v;
+  var a = new Uint8Array(18);
+  try { crypto.getRandomValues(a); } catch(e){ for (var i = 0; i < 18; i++) a[i] = Math.floor(Math.random() * 256); }
+  v = btoa(String.fromCharCode.apply(null, a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  lsSet('pnr-visiteur', v); return v;
+})();
+// messages du serveur affichés dans la langue de la page (le serveur répond en français)
+var SRV_MSG = {quota: 'Deine 2 kostenlosen Berechnungen sind aufgebraucht.', auth: 'Gib deinen Zugangscode ein, um den Assistenten zu nutzen.', limit: 'Monatliches Nutzungslimit erreicht. Der Zähler startet am Monatsersten neu.', busy: 'Der Assistent ist gerade sehr gefragt. Versuch es gleich noch einmal.', upstream: 'Der Assistent antwortet gerade nicht. Versuch es gleich noch einmal.', config: 'Der Assistent ist im Moment nicht verfügbar.', rate: 'Zu viele Versuche. Probier es in ein paar Minuten noch einmal.', code: 'Ungültiger Zugangscode.'};
+function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
+function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' pro Monat' : (ACC && ACC.price) || ''; }
+function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? 'Weiter mit dem Abo: ' + priceLabel() + ', ohne Vertragsbindung.' : 'Das Abo für ' + priceLabel() + ' startet in Kürze. Hast du einen Zugangscode? Gib ihn unten ein.'); }
 function api(path, body, signal){
   var h = body === undefined ? {} : {'content-type': 'application/json'}, jt = lsGet('pnr-session');
   if (jt) h['x-pnr-session'] = jt;
+  if (SITE) h['x-pnr-visiteur'] = VID;
   return fetch(path, {method: body === undefined ? 'GET' : 'POST', headers: h, body: body === undefined ? undefined : JSON.stringify(body), credentials: 'same-origin', signal: signal})
     .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ j.status_ = r.status; return j; }); });
 }
 function showPay(msg){ A.ready = false; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').hidden = !$('#a-thread').children.length; $('#a-pay').hidden = false; $('#a-pay-msg').textContent = msg || ''; }
 function accountLine(){
   var el = $('#a-account');
+  if (ACC && ACC.visiteur){ el.hidden = false; el.innerHTML = '<b>Kostenlose Berechnungen, ohne Anmeldung: ' + ACC.cases_left + ' / ' + ACC.cases_max + '</b>'; return; }
   if (!ACC || !(ACC.email || ACC.nom)){ el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = 'Angemeldet: ' + esc(ACC.email || ACC.nom) +(ACC.free && ACC.active ? ' · kostenloser Zugang' : '') + (ACC.active && ACC.limit ? ' · ' + ACC.used + ' / ' + ACC.limit + ' Fragen diesen Monat' : '') +
     (ACC.free ? '' : ' · <button class="linkbtn" type="button" data-acc="portal">Mein Abo verwalten</button>') + ' · <button class="linkbtn" type="button" data-acc="logout">Abmelden</button>';
 }
 // site sans clé IA : l'assistant est annoncé, le reste du site marche normalement
-function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'Der KI-Assistent kommt bald. Bis dahin sind die Schnelltests, die vollständige Berechnung, das PDF und der Vergleich deiner Berechnungen kostenlos.'); $('#a-note').textContent = 'Der KI-Assistent wird im Monatsabo angeboten.'; }
+function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'Der KI-Assistent kommt bald. Bis dahin sind die vollständige Berechnung, das PDF und der Vergleich deiner Berechnungen kostenlos.'); $('#a-note').textContent = 'Der KI-Assistent wird im Monatsabo angeboten.'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
   if (q.get('bienvenue')) toast('Abo aktiviert. Stell deine erste Frage.');
@@ -1234,17 +1268,20 @@ function siteStart(){
   api('/api/me').then(function(m){
     ACC = m;
     var R = m.ready || {ai: true, pay: true, email: true};
-    if (m.price) $('#a-price').textContent = m.price;
-    if (m.limit) $('#a-note').textContent = (R.pay ? 'Im Abo enthalten' : 'Zugang auf Einladung') + ' : bis zu ' + m.limit + ' Fragen pro Monat. Deine Fragen werden von Claude (Anthropic) verarbeitet. Deine gespeicherten Berechnungen bleiben in deinem Browser.';
+    if (priceLabel()) $('#a-price').textContent = priceLabel();
+    if (m.visiteur) $('#a-note').textContent = 'Deine Fragen werden von Claude (Anthropic) verarbeitet. Deine gespeicherten Berechnungen bleiben in deinem Browser.';
+    else if (m.limit) $('#a-note').textContent = (R.pay ? 'Im Abo enthalten' : 'Zugang auf Einladung') + ' : bis zu ' + m.limit + ' Fragen pro Monat. Deine Fragen werden von Claude (Anthropic) verarbeitet. Deine gespeicherten Berechnungen bleiben in deinem Browser.';
     else if (R.code && !R.pay) $('#a-note').textContent = 'Während des Tests ist der Assistent eingeladenen Personen vorbehalten. Deine Fragen werden von Claude (Anthropic) verarbeitet.';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
-    if (!R.pay) $('#a-pay-kicker').textContent = 'Privater Test';
+    if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : 'Privater Test';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', 'Hallo. Sag mir, was du kalkulieren willst: ein Produkt, eine Baustelle oder deinen Stundensatz. Ich stelle dir die Fragen nacheinander, und der Rechenkern rechnet.');
-    } else if (!R.pay) showPay(R.code ? 'Der Assistent ist in einem privaten Test, auf Einladung. Gib deinen Zugangscode ein, um ihn zu nutzen.' : 'Der Assistent ist in einem privaten Test. Wenn deine Adresse eingeladen ist, bekommst du deinen Anmeldelink per E-Mail.');
+      if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
+    } else if (m.visiteur) showPay(quotaMsg());
+    else if (!R.pay) showPay(R.code ? 'Der Assistent ist in einem privaten Test, auf Einladung. Gib deinen Zugangscode ein, um ihn zu nutzen.' : 'Der Assistent ist in einem privaten Test. Wenn deine Adresse eingeladen ist, bekommst du deinen Anmeldelink per E-Mail.');
     else if (m.email) showPay('Dein Abo ist nicht mehr aktiv. Schließ es erneut ab, um den Assistenten wieder zu nutzen.');
     else showPay('Beschreib deine Baustelle, dein Produkt oder deinen Auftrag mit deinen Worten: Der Assistent stellt dir die richtigen Fragen, und der Rechenkern berechnet deinen echten Preis.');
   }, function(){ showPay('Der Server antwortet gerade nicht. Die Tests und die vollständige Berechnung funktionieren trotzdem.'); });
@@ -1269,7 +1306,7 @@ if (SITE){
     b.disabled = true;
     api('/api/code', {code: c}).then(function(r){
       b.disabled = false;
-      if (!r.ok){ toast(r.message || 'Ungültiger Zugangscode.'); return; }
+      if (!r.ok){ toast(srvMsg(r, 'Ungültiger Zugangscode.')); return; }
       if (r.jeton) lsSet('pnr-session', r.jeton);
       $('#a-code-in').value = ''; $('#a-thread').innerHTML = ''; toast('Zugang offen. Stell deine erste Frage.'); siteStart();
     }, function(){ b.disabled = false; toast('Anmeldung nicht möglich. Versuch es noch einmal.'); });
@@ -1312,7 +1349,7 @@ function askSite(text){
       var txt = r.content.filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
       txt = plainText(txt);
       if (txt){ if (out){ out.textContent = txt; out = null; } else bubble('ai', txt); }
-      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; accountLine(); }
+      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; if (ACC.visiteur){ ACC.cases_used = r.usage.cases_used; ACC.cases_left = r.usage.cases_left; } accountLine(); }
       var hasTool = r.content.some(function(b){ return b.type === 'tool_use'; });
       if (hasTool && (r.stop_reason !== 'tool_use' || rounds >= 5)){
         // appel d'outil coupé ou trop d'étapes : on retire l'échange pour garder une conversation valide
@@ -1331,6 +1368,7 @@ function askSite(text){
       }
       if (out){ out.remove(); out = null; }
       if (r.stop_reason === 'max_tokens') bubble('sys', 'Antwort abgeschnitten: Stell eine kürzere Frage.');
+      if (ACC && ACC.visiteur && ACC.cases_left === 0 && !A.lastFree){ A.lastFree = true; bubble('sys', 'Das war deine letzte kostenlose Berechnung: Du kannst sie hier noch präzisieren. Für eine neue Berechnung brauchst du das Abo.'); }
       setStatus('');
     });
   }
@@ -1338,11 +1376,19 @@ function askSite(text){
     if (out) out.remove();
     A.turns = before;
     if (e && e.name === 'AbortError'){ setStatus('Gestoppt.'); return; }
-    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(e.message); return; }
+    if (e && e.error === 'quota'){ setStatus(''); if (ACC){ ACC.cases_left = 0; ACC.active = false; accountLine(); } showPay(quotaMsg()); return; }
+    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(srvMsg(e)); return; }
     if (e && e.error === 'bad_request'){ A.turns = []; A.last = null; bubble('sys', 'Neues Gespräch: Das vorherige war zu lang. Stell deine Frage noch einmal.'); setStatus(''); return; }
-    setStatus((e && e.message) || 'Die Antwort wurde unterbrochen. Versuch es noch einmal.');
-  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; });
+    setStatus(srvMsg(e, 'Die Antwort wurde unterbrochen. Versuch es noch einmal.'));
+  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; $('#a-new').hidden = !A.turns.length || !A.ready; });
 }
+// nouveau calcul : nouvelle conversation (pour un visiteur, c'est un nouveau calcul offert)
+$('#a-new').addEventListener('click', function(){
+  if (A.ctl) return;
+  A.turns = []; A.last = null; A.lastFree = false; $('#a-thread').innerHTML = ''; this.hidden = true;
+  bubble('ai', 'Hallo. Sag mir, was du kalkulieren willst: ein Produkt, eine Baustelle oder deinen Stundensatz. Ich stelle dir die Fragen nacheinander, und der Rechenkern rechnet.');
+  $('#a-chips').hidden = false; focusChat();
+});
 $('#a-form').addEventListener('submit', function(e){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); });
 $('#a-input').addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); } });
 $('#a-stop').addEventListener('click', function(){ if (A.ctl) A.ctl.abort(); });
@@ -1355,7 +1401,7 @@ $('#g-list').innerHTML = GUIDES.map(function(g){
     '<h4>Rechenbeispiel</h4><p>' + esc(g.example) + '</p>' + (g.extra ? '<p class="mute">' + esc(g.extra) + '</p>' : '') +
     (g.errors ? '<h4>Die Fehler, die Geld kosten</h4><ol>' + g.errors.map(function(e){ return '<li>' + esc(e) + '</li>'; }).join('') + '</ol>' : '') +
     (g.faq ? g.faq.map(function(f){ return '<h4>' + esc(f[0]) + '</h4><p>' + esc(f[1]) + '</p>'; }).join('') : '') +
-    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#calcul" data-goto="' + g.type + '">Meine Berechnung starten</a></div></div></details>';
+    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#accueil" data-ask="' + g.type + '">Meine Berechnung starten</a></div></div></details>';
 }).join('');
 
 // ---------- exposé pour les tests automatiques ----------
@@ -1363,7 +1409,6 @@ window.__PNR_TEST = {coerce: coerce, guard: guard, compact: compact, openFromInp
 
 // ---------- démarrage ----------
 renderForm(); compute();
-var metierQ = new URLSearchParams(location.search).get('metier');
 if (metierQ && CFG[metierQ]) setType(metierQ);
 show(location.hash.slice(1) || 'accueil');
 })();

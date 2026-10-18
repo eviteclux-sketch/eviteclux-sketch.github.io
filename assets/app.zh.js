@@ -296,6 +296,8 @@ function armed(btn, label){ if (btn.dataset.armed === '1'){ btn.dataset.armed = 
 var VIEWS = ['accueil', 'tests', 'calcul', 'assistant', 'calculs', 'guides'];
 var current = 'accueil';
 function show(v){
+  var toChat = v === 'assistant';
+  if (v === 'assistant' || v === 'tests') v = 'accueil';
   if (VIEWS.indexOf(v) < 0) v = 'accueil';
   current = v;
   $$('[data-view]').forEach(function(s){ s.hidden = s.getAttribute('data-view') !== v; });
@@ -303,7 +305,9 @@ function show(v){
   $('#c-mini').hidden = v !== 'calcul';
   if (v === 'calculs') renderSaved();
   window.scrollTo(0, 0);
+  if (toChat) focusChat();
 }
+function focusChat(){ var b = $('#a-box'), i = $('#a-input'); if (b) b.scrollIntoView({block: 'start'}); if (i && !i.closest('[hidden]')) setTimeout(function(){ try { i.focus({preventScroll: true}); } catch(e){} }, 60); }
 window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); });
 
 // ---------- accueil ----------
@@ -313,6 +317,10 @@ window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); 
     return '<li class="' + (x[3] ? 'sum' : '') + '"><div class="lab"><span>' + x[0] + '</span><span class="num">' + eur(x[1]) + '</span></div><div class="track"><i style="width:' + (x[1] / 75.20 * 100).toFixed(1) + '%;background:' + x[2] + ';animation-delay:' + (200 + i * 120) + 'ms"></i></div></li>';
   }).join('');
   $$('[data-open]').forEach(function(b){ b.addEventListener('click', function(){ setType(b.getAttribute('data-open')); location.hash = 'calcul'; }); });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-ask]'); if (!b) return;
+    e.preventDefault(); prepAsk(b.getAttribute('data-ask'), true);
+  });
 })();
 
 // ---------- tests rapides ----------
@@ -1073,6 +1081,16 @@ function renderSaved(){
 
 // ---------- assistant ----------
 var A = {sample: null, tools: false, turns: [], ctl: null, last: null};
+// début de question et exemple proposés selon le métier choisi
+var ASK_START = {fabrication: '我生产一种产品，想知道我真实的成本价和底价。 ', travaux: '我要按平方米给一个工程报价，想知道我的底价。 ', services: '我想知道我真实的小时费率，以及我需要计费的工时。 '};
+var ASK_HINT = {fabrication: '例如：每批 40 罐果酱，工作 2 小时，水果和糖 €38…', travaux: '例如：180 m² 瓦屋面，4 人团队，我按 €59/m² 收费…', services: '例如：独立会计师，收费 €70/小时，每周 40 小时…'};
+function prepAsk(type, fill){
+  var i = $('#a-input');
+  if (i && ASK_HINT[type]) i.placeholder = ASK_HINT[type];
+  if (i && fill && ASK_START[type] && !i.value.trim()) i.value = ASK_START[type];
+  var h = location.hash.slice(1);
+  if (h && h !== 'accueil' && h !== 'assistant') location.hash = 'assistant'; else focusChat();
+}
 function num_(v){ if (typeof v === 'number') return v; if (typeof v === 'string'){ var t = v.replace('%', '').trim(); var n = parseNum(t); return n === undefined || isNaN(n) ? v : n; } return v; }
 function coerce(o){
   var out = {};
@@ -1206,22 +1224,38 @@ function ask(text){
 function plainText(s){ return String(s || '').replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/__([^_\n]+)__/g, '$1').replace(/^#{1,6}\s+/gm, '').replace(/^(\s*)[*•]\s+/gm, '$1– ').trim(); }
 // ---------- assistant sur le site web : abonnement, connexion, serveur ----------
 var ACC = null;
+var metierQ = new URLSearchParams(location.search).get('metier');
+var VID = (function(){
+  var v = lsGet('pnr-visiteur');
+  if (typeof v === 'string' && /^[A-Za-z0-9_-]{16,64}$/.test(v)) return v;
+  var a = new Uint8Array(18);
+  try { crypto.getRandomValues(a); } catch(e){ for (var i = 0; i < 18; i++) a[i] = Math.floor(Math.random() * 256); }
+  v = btoa(String.fromCharCode.apply(null, a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  lsSet('pnr-visiteur', v); return v;
+})();
+// messages du serveur affichés dans la langue de la page (le serveur répond en français)
+var SRV_MSG = {quota: '你的 2 次免费计算已用完。', auth: '输入你的访问码，即可使用助手。', limit: '本月使用次数已达上限。计数会在每月 1 日清零。', busy: '现在使用助手的人很多。请稍后再试。', upstream: '助手暂时没有响应。请稍后再试。', config: '助手暂时无法使用。', rate: '尝试次数过多。请过几分钟再试。', code: '访问码无效。'};
+function srvMsg(e, d){ return (e && SRV_MSG[e.error]) || d || (e && e.message) || ''; }
+function priceLabel(){ return ACC && ACC.price_eur ? eur(ACC.price_eur, 0) + ' / 月' : (ACC && ACC.price) || ''; }
+function quotaMsg(){ var R = (ACC && ACC.ready) || {}; return SRV_MSG.quota + ' ' + (R.pay ? '如需继续，请订阅 ' + priceLabel() + '，无最低期限。' : '价格为 ' + priceLabel() + ' 的订阅即将开通。你有访问码吗？请在下方输入。'); }
 function api(path, body, signal){
   var h = body === undefined ? {} : {'content-type': 'application/json'}, jt = lsGet('pnr-session');
   if (jt) h['x-pnr-session'] = jt;
+  if (SITE) h['x-pnr-visiteur'] = VID;
   return fetch(path, {method: body === undefined ? 'GET' : 'POST', headers: h, body: body === undefined ? undefined : JSON.stringify(body), credentials: 'same-origin', signal: signal})
     .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ j.status_ = r.status; return j; }); });
 }
 function showPay(msg){ A.ready = false; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').hidden = !$('#a-thread').children.length; $('#a-pay').hidden = false; $('#a-pay-msg').textContent = msg || ''; }
 function accountLine(){
   var el = $('#a-account');
+  if (ACC && ACC.visiteur){ el.hidden = false; el.innerHTML = '<b>免费计算（无需注册）： ' + ACC.cases_left + ' / ' + ACC.cases_max + '</b>'; return; }
   if (!ACC || !(ACC.email || ACC.nom)){ el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = '已登录: ' + esc(ACC.email || ACC.nom) +(ACC.free && ACC.active ? ' · 免费访问' : '') + (ACC.active && ACC.limit ? ' · ' + ACC.used + ' / ' + ACC.limit + ' 个问题（本月）' : '') +
     (ACC.free ? '' : ' · <button class="linkbtn" type="button" data-acc="portal">管理我的订阅</button>') + ' · <button class="linkbtn" type="button" data-acc="logout">退出登录</button>';
 }
 // site sans clé IA : l'assistant est annoncé, le reste du site marche normalement
-function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'AI 助手即将上线。在此之前，快速测试、完整计算、PDF 和计算对比都是免费的。'); $('#a-note').textContent = 'AI 助手将按月订阅提供。'; }
+function soon(){ A.ready = false; $('#a-pay').hidden = true; $('#a-form').hidden = true; $('#a-chips').hidden = true; $('#a-thread').innerHTML = ''; bubble('sys', 'AI 助手即将上线。在此之前，完整计算、PDF 和计算对比都是免费的。'); $('#a-note').textContent = 'AI 助手将按月订阅提供。'; }
 function siteStart(){
   var q = new URLSearchParams(location.search);
   if (q.get('bienvenue')) toast('订阅已激活。请提出你的第一个问题。');
@@ -1234,17 +1268,20 @@ function siteStart(){
   api('/api/me').then(function(m){
     ACC = m;
     var R = m.ready || {ai: true, pay: true, email: true};
-    if (m.price) $('#a-price').textContent = m.price;
-    if (m.limit) $('#a-note').textContent = (R.pay ? '订阅包含' : '受邀访问') + ' : 每月最多 ' + m.limit + ' 个问题。你的问题由 Claude（Anthropic）处理。你保存的计算保留在你的浏览器中。';
+    if (priceLabel()) $('#a-price').textContent = priceLabel();
+    if (m.visiteur) $('#a-note').textContent = '你的问题由 Claude（Anthropic）处理。你保存的计算保留在你的浏览器中。';
+    else if (m.limit) $('#a-note').textContent = (R.pay ? '订阅包含' : '受邀访问') + ' : 每月最多 ' + m.limit + ' 个问题。你的问题由 Claude（Anthropic）处理。你保存的计算保留在你的浏览器中。';
     else if (R.code && !R.pay) $('#a-note').textContent = '测试期间，助手仅供受邀人员使用。你的问题由 Claude（Anthropic）处理。';
     accountLine();
     $('#a-sub').hidden = !R.pay; $('#a-login').hidden = !R.email; $('#a-code').hidden = !R.code; $('#a-terms').hidden = !R.pay;
-    if (!R.pay) $('#a-pay-kicker').textContent = '内测';
+    if (!R.pay) $('#a-pay-kicker').textContent = m.visiteur ? 'Abonnement' : '内测';
     if (!m.active && (!R.ai || (!R.pay && !R.email && !R.code))){ soon(); return; }
     if (m.active){
       $('#a-pay').hidden = true; $('#a-thread').hidden = false; $('#a-form').hidden = false; $('#a-chips').hidden = false; A.ready = true;
       bubble('ai', '你好。告诉我你想算什么：一个产品、一个工程，还是你的小时费率。我会一个一个地问你问题，由计算引擎来算。');
-    } else if (!R.pay) showPay(R.code ? '助手正在内测，仅限受邀用户。输入你的访问码即可使用。' : '助手正在内测。如果你的邮箱已受邀，可以通过电子邮件接收登录链接。');
+      if (metierQ && ASK_HINT[metierQ]) prepAsk(metierQ, false);
+    } else if (m.visiteur) showPay(quotaMsg());
+    else if (!R.pay) showPay(R.code ? '助手正在内测，仅限受邀用户。输入你的访问码即可使用。' : '助手正在内测。如果你的邮箱已受邀，可以通过电子邮件接收登录链接。');
     else if (m.email) showPay('你的订阅已失效。重新订阅即可继续使用助手。');
     else showPay('用你自己的话描述你的工程、产品或业务：助手会问你该问的问题，由引擎算出你的真实价格。');
   }, function(){ showPay('服务器暂时没有响应。测试和完整计算照样可以使用。'); });
@@ -1269,7 +1306,7 @@ if (SITE){
     b.disabled = true;
     api('/api/code', {code: c}).then(function(r){
       b.disabled = false;
-      if (!r.ok){ toast(r.message || '访问码无效。'); return; }
+      if (!r.ok){ toast(srvMsg(r, '访问码无效。')); return; }
       if (r.jeton) lsSet('pnr-session', r.jeton);
       $('#a-code-in').value = ''; $('#a-thread').innerHTML = ''; toast('访问已开通。请提出你的第一个问题。'); siteStart();
     }, function(){ b.disabled = false; toast('无法连接。请重试。'); });
@@ -1312,7 +1349,7 @@ function askSite(text){
       var txt = r.content.filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
       txt = plainText(txt);
       if (txt){ if (out){ out.textContent = txt; out = null; } else bubble('ai', txt); }
-      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; accountLine(); }
+      if (r.usage && ACC){ ACC.used = r.usage.used; ACC.limit = r.usage.limit; if (ACC.visiteur){ ACC.cases_used = r.usage.cases_used; ACC.cases_left = r.usage.cases_left; } accountLine(); }
       var hasTool = r.content.some(function(b){ return b.type === 'tool_use'; });
       if (hasTool && (r.stop_reason !== 'tool_use' || rounds >= 5)){
         // appel d'outil coupé ou trop d'étapes : on retire l'échange pour garder une conversation valide
@@ -1331,6 +1368,7 @@ function askSite(text){
       }
       if (out){ out.remove(); out = null; }
       if (r.stop_reason === 'max_tokens') bubble('sys', '回复被截断：请问一个更短的问题。');
+      if (ACC && ACC.visiteur && ACC.cases_left === 0 && !A.lastFree){ A.lastFree = true; bubble('sys', '这是你最后一次免费计算：你仍可以在这里继续细化它。如果要做新的计算，需要订阅。'); }
       setStatus('');
     });
   }
@@ -1338,11 +1376,19 @@ function askSite(text){
     if (out) out.remove();
     A.turns = before;
     if (e && e.name === 'AbortError'){ setStatus('已停止。'); return; }
-    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(e.message); return; }
+    if (e && e.error === 'quota'){ setStatus(''); if (ACC){ ACC.cases_left = 0; ACC.active = false; accountLine(); } showPay(quotaMsg()); return; }
+    if (e && (e.error === 'auth' || e.error === 'inactive')){ if (e.error === 'auth') lsSet('pnr-session', null); setStatus(''); showPay(srvMsg(e)); return; }
     if (e && e.error === 'bad_request'){ A.turns = []; A.last = null; bubble('sys', '新对话：上一段对话太长了。请重新提问。'); setStatus(''); return; }
-    setStatus((e && e.message) || '回复中断了。请重试。');
-  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; });
+    setStatus(srvMsg(e, '回复中断了。请重试。'));
+  }).then(function(){ A.ctl = null; $('#a-send').hidden = false; $('#a-stop').hidden = true; $('#a-new').hidden = !A.turns.length || !A.ready; });
 }
+// nouveau calcul : nouvelle conversation (pour un visiteur, c'est un nouveau calcul offert)
+$('#a-new').addEventListener('click', function(){
+  if (A.ctl) return;
+  A.turns = []; A.last = null; A.lastFree = false; $('#a-thread').innerHTML = ''; this.hidden = true;
+  bubble('ai', '你好。告诉我你想算什么：一个产品、一个工程，还是你的小时费率。我会一个一个地问你问题，由计算引擎来算。');
+  $('#a-chips').hidden = false; focusChat();
+});
 $('#a-form').addEventListener('submit', function(e){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); });
 $('#a-input').addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); var t = $('#a-input').value; $('#a-input').value = ''; ask(t); } });
 $('#a-stop').addEventListener('click', function(){ if (A.ctl) A.ctl.abort(); });
@@ -1355,7 +1401,7 @@ $('#g-list').innerHTML = GUIDES.map(function(g){
     '<h4>数字示例</h4><p>' + esc(g.example) + '</p>' + (g.extra ? '<p class="mute">' + esc(g.extra) + '</p>' : '') +
     (g.errors ? '<h4>代价高昂的错误</h4><ol>' + g.errors.map(function(e){ return '<li>' + esc(e) + '</li>'; }).join('') + '</ol>' : '') +
     (g.faq ? g.faq.map(function(f){ return '<h4>' + esc(f[0]) + '</h4><p>' + esc(f[1]) + '</p>'; }).join('') : '') +
-    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#calcul" data-goto="' + g.type + '">开始我的计算</a></div></div></details>';
+    '<div class="btn-row"><a class="btn btn-hivis btn-sm" href="#accueil" data-ask="' + g.type + '">开始我的计算</a></div></div></details>';
 }).join('');
 
 // ---------- exposé pour les tests automatiques ----------
@@ -1363,7 +1409,6 @@ window.__PNR_TEST = {coerce: coerce, guard: guard, compact: compact, openFromInp
 
 // ---------- démarrage ----------
 renderForm(); compute();
-var metierQ = new URLSearchParams(location.search).get('metier');
 if (metierQ && CFG[metierQ]) setType(metierQ);
 show(location.hash.slice(1) || 'accueil');
 })();
