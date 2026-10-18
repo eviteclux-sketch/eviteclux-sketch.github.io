@@ -1,0 +1,304 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Prix Net Réel：看清你的真实利润率，工程、生产或工时都能算</title><meta name="description" content="用你自己的数字，2 分钟算出你的底价、建议售价和你真正剩下的：按公斤、按平方米或按小时。免费，无需注册。"><link rel="canonical" href="https://prixnetreel.eviteclux.com/zh/"><meta name="robots" content="noindex"><meta property="og:type" content="website"><meta property="og:title" content="Prix Net Réel：看清你的真实利润率，工程、生产或工时都能算"><meta property="og:description" content="用你自己的数字，2 分钟算出你的底价、建议售价和你真正剩下的：按公斤、按平方米或按小时。免费，无需注册。"><meta property="og:url" content="https://prixnetreel.eviteclux.com/zh/"><meta property="og:locale" content="zh_CN"><link rel="alternate" hreflang="fr" href="https://prixnetreel.eviteclux.com/"><link rel="alternate" hreflang="en" href="https://prixnetreel.eviteclux.com/en/"><link rel="alternate" hreflang="es" href="https://prixnetreel.eviteclux.com/es/"><link rel="alternate" hreflang="de" href="https://prixnetreel.eviteclux.com/de/"><link rel="alternate" hreflang="zh" href="https://prixnetreel.eviteclux.com/zh/"><link rel="alternate" hreflang="ru" href="https://prixnetreel.eviteclux.com/ru/"><link rel="alternate" hreflang="x-default" href="https://prixnetreel.eviteclux.com/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,600..900&family=JetBrains+Mono:wght@400;500&family=Public+Sans:wght@400;600;700&display=swap"><style>[hidden]:not([hidden=until-found i]){display:none!important}body{margin:0}</style><link rel="stylesheet" href="/assets/app.css?v=202610180018"></head><body><header class="bar">
+  <div class="wrap">
+    <a class="brand" href="/zh/#accueil"><span class="brand-mark" aria-hidden="true">€</span><span>PRIX NET <span style="color:var(--hivis)">RÉEL</span></span></a>
+    <nav class="tabsnav" aria-label="栏目">
+      <a href="#accueil" data-nav="accueil">首页</a>
+      <a href="#tests" data-nav="tests">快速测试</a>
+      <a href="#calcul" data-nav="calcul">完整计算</a>
+      <a href="#assistant" data-nav="assistant">AI 助手</a>
+      <a href="#calculs" data-nav="calculs">我的计算</a>
+      <a href="#guides" data-nav="guides">指南</a>
+    </nav>
+    <div class="lang"><svg class="lang-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5M12 2.5C9.4 5.3 8.1 8.5 8.1 12s1.3 6.7 3.9 9.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><select id="lang-sel" aria-label="网站语言" onchange="pnrLang(this)"><option value="/" lang="fr">Français</option><option value="/en/" lang="en">English</option><option value="/es/" lang="es">Español</option><option value="/de/" lang="de">Deutsch</option><option value="/zh/" lang="zh" selected>简体中文</option><option value="/ru/" lang="ru">Русский</option></select></div>
+  </div>
+</header><div id="lang-banner" class="lang-banner" hidden><div class="wrap"><span></span><a class="btn btn-sm" href="#"></a><button type="button" class="lang-x">×</button></div></div>
+
+<main>
+<!-- ============ ACCUEIL ============ -->
+<section id="v-accueil" data-view="accueil">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">生产制作 · 施工工程 · 自由职业者</p>
+        <h1 style="margin-top:14px">你知道你的售价。可你真的知道<span class="hl">你的利润率？</span></h1>
+        <p class="sub">无论是你的产品、你的工程，还是你的工时。</p>
+        <p class="pitch">你带来你的经验：你的单价、你的工效、你的做事方式。<b>我们给你一个 2 分钟算清真实成本的工具</b>，用的是你所在国家的税费率、你的行业、你的工作地点和你公司的数字。</p>
+        <div class="btn-row">
+          <a class="btn btn-hivis" href="#tests">免费试用</a>
+          <a class="btn btn-line" href="#calcul">做完整计算</a>
+        </div>
+      </div>
+      <aside class="ticket" aria-label="数字示例：一炉 20 个面包">
+        <p class="eyebrow">数字示例 · 完整计算</p>
+        <h3>20 个乡村面包，每个售价 €3.76 不含税</h3>
+        <ul class="casc" id="home-cascade"></ul>
+        <p class="foot">面包师以为这一炉能赚 <b class="num">€26.38</b>。算上风险、费用和税，他实际只剩 <b class="num" style="color:var(--ok)">€17.98</b>。</p>
+      </aside>
+    </div>
+  </div>
+  <div class="hazard" aria-hidden="true"></div>
+
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">真正的问题</p>
+      <h2>你的成本在变。你的价格呢？</h2>
+      <p class="mute">柴油、电、面粉、钢材：你的采购价说变就变。而你的售价，是什么时候定的？</p>
+    </div>
+    <div class="costs">
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="8" width="20" height="34" rx="3" fill="none" stroke="var(--ink)" stroke-width="3"/><rect x="12" y="13" width="12" height="9" fill="var(--hivis)"/><path d="M28 18h5l4 5v13a3 3 0 0 1-6 0v-8h-3" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><line x1="5" y1="42" x2="31" y2="42" stroke="var(--ink)" stroke-width="3"/></svg>
+        <h3>燃油</h3><p class="small mute">每加一次油，都压在每个工程、每趟送货上。</p>
+      </div>
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M27 4 11 27h11l-3 17 18-25H26l1-15Z" fill="var(--hivis)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/></svg>
+        <h3>能源</h3><p class="small mute">烤炉、作坊、办公室：电费分摊到每一个小时。</p>
+      </div>
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 10h20l4 6v24a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V16l4-6Z" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M10 16h28" stroke="var(--ink)" stroke-width="3"/><rect x="16" y="23" width="16" height="10" fill="var(--hivis)"/></svg>
+        <h3>原材料</h3><p class="small mute">面粉、木材、钢材、瓦片：昨天的采购价已经不是今天的了。</p>
+      </div>
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M24 13v12l8 5" fill="none" stroke="var(--hivis)" stroke-width="4" stroke-linecap="round"/></svg>
+        <h3>你的一小时</h3><p class="small mute">工资、社保、未计费的时间：你的一小时比你想的更贵。</p>
+      </div>
+    </div>
+    <div class="callout">
+      <p>用你今天的数字，2 分钟重新算出你的价格。</p>
+      <a class="btn btn-hivis" href="#tests">想试试？</a>
+    </div>
+  </div>
+
+  <div class="wrap sec" style="padding-top:0">
+    <div class="sec-head">
+      <p class="eyebrow">三个行业，一个引擎</p>
+      <h2>选择你的行业</h2>
+    </div>
+    <div class="trades">
+      <button class="trade" data-open="fabrication"><span class="units">按公斤 · 按升 · 按件</span><h3>生产制作</h3><span class="small mute">面包师、熟食商、作坊、生产者。原材料、损耗、时间、费用：算出你每单位的底价。</span></button>
+      <button class="trade" data-open="travaux"><span class="units">按平方米</span><h3>施工工程</h3><span class="small mute">屋面工、瓷砖工、油漆工、建筑公司。你的工效、你的团队、你按天计的费用。</span></button>
+      <button class="trade" data-open="services"><span class="units">按小时</span><h3>服务</h3><span class="small mute">自由职业者、会计、事务所、顾问。对照真正计费的工时，算出你真实的小时费率。</span></button>
+    </div>
+  </div>
+
+  <div class="wrap sec" style="padding-top:0">
+    <div class="sec-head">
+      <p class="eyebrow">怎么用</p>
+      <h2>你的数字，我们的引擎</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><b>1. 你提供数字</b><span class="small mute">采购价、时间、工效、费用。没人比你更清楚这些：工具不会编造任何数字。</span></div>
+      <div class="step"><b>2. 引擎来计算</b><span class="small mute">成本价、风险、费用、税。脚手架按整天付费，未计费的时间也算在内。</span></div>
+      <div class="step"><b>3. 你知道了你的真实价格</b><span class="small mute">你的底价、建议售价、赚到目标收入所需的价格，以及你的实际净得。</span></div>
+    </div>
+    <p class="testnote" style="margin-top:22px">快速测试、完整计算和指南均免费，无需注册。你的计算保存在你的浏览器中。AI 助手正在内测，仅限受邀用户。增值税、所得税和社保的费率由你自己填写：它们取决于你所在的国家和你的身份。</p>
+  </div>
+</section>
+
+<!-- ============ TESTS RAPIDES ============ -->
+<section id="v-tests" data-view="tests" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">免费 · 30 秒</p>
+      <h2>想试试？选一个问题。</h2>
+      <p class="mute">预先填好的数字只是示例。换成你自己的。</p>
+    </div>
+    <div class="qtabs" role="tablist" aria-label="四个测试">
+      <button class="qtab" role="tab" id="qt-taux" aria-controls="qp-taux" aria-selected="true"><small>自由职业者</small><span>你真实的小时费率？</span></button>
+      <button class="qtab" role="tab" id="qt-vehic" aria-controls="qp-vehic" aria-selected="false" tabindex="-1"><small>所有行业</small><span>你的车辆花多少钱？</span></button>
+      <button class="qtab" role="tab" id="qt-prod" aria-controls="qp-prod" aria-selected="false" tabindex="-1"><small>生产制作</small><span>一件产品给你赚多少？</span></button>
+      <button class="qtab" role="tab" id="qt-m2" aria-controls="qp-m2" aria-selected="false" tabindex="-1"><small>施工工程</small><span>你每平方米的底价？</span></button>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-taux" aria-labelledby="qt-taux">
+      <form data-q="taux" novalidate class="stack">
+        <h3 style="font-size:1.4rem">你知道你真实的小时费率吗？</h3>
+        <p class="small mute">示例：一位单干的自由职业者，每年费用 €60,000。</p>
+        <div class="fields">
+          <div class="field"><label for="ta-ch">全年总费用（含你的报酬）</label><div class="inp"><input id="ta-ch" inputmode="decimal" value="60000"><em>€ / 年</em></div></div>
+          <div class="field"><label for="ta-h">每周工作小时数</label><div class="inp"><input id="ta-h" inputmode="decimal" value="40"><em>小时</em></div></div>
+          <div class="field"><label for="ta-s">每年工作周数</label><div class="inp"><input id="ta-s" inputmode="decimal" value="44"><em>周</em></div></div>
+          <div class="field"><label for="ta-p">这些工时中真正计费的比例</label><div class="inp"><input id="ta-p" inputmode="decimal" value="62"><em>%</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-taux"></div>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-vehic" aria-labelledby="qt-vehic" hidden>
+      <form data-q="vehic" novalidate class="stack">
+        <h3 style="font-size:1.4rem">你的车辆真正花你多少钱？</h3>
+        <p class="small mute">示例：2 辆融资租赁的柴油小货车。</p>
+        <div class="fields two">
+          <div class="field"><label for="ve-n">车辆数量</label><div class="inp"><input id="ve-n" inputmode="decimal" value="2"></div></div>
+          <div class="field"><label for="ve-km">每辆车每年公里数</label><div class="inp"><input id="ve-km" inputmode="decimal" value="25000"><em>km</em></div></div>
+          <div class="field"><label for="ve-c">油耗</label><div class="inp"><input id="ve-c" inputmode="decimal" value="8"><em>L/100 km</em></div></div>
+          <div class="field"><label for="ve-p">燃油价格</label><div class="inp"><input id="ve-p" inputmode="decimal" value="1.65"><em>€/L</em></div></div>
+          <div class="field"><label for="ve-a">每辆车的保险和税费</label><div class="inp"><input id="ve-a" inputmode="decimal" value="1200"><em>€/年</em></div></div>
+          <div class="field"><label for="ve-e">每辆车的保养和轮胎</label><div class="inp"><input id="ve-e" inputmode="decimal" value="900"><em>€/年</em></div></div>
+          <div class="field"><label for="ve-l">每辆车的租赁费或折旧</label><div class="inp"><input id="ve-l" inputmode="decimal" value="4800"><em>€/年</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-vehic"></div>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-prod" aria-labelledby="qt-prod" hidden>
+      <form data-q="prod" novalidate class="stack">
+        <h3 style="font-size:1.4rem">一件产品真正给你赚多少？</h3>
+        <p class="small mute">示例：一个 700 g 的乡村面包。</p>
+        <div class="fields">
+          <div class="field"><label for="pr-pv">不含税售价</label><div class="inp"><input id="pr-pv" inputmode="decimal" value="3.76"><em>€/件</em></div></div>
+          <div class="field"><label for="pr-m">每件原材料</label><div class="inp"><input id="pr-m" inputmode="decimal" value="0.2287"><em>€/件</em></div></div>
+          <div class="field"><label for="pr-min">每件工作分钟数</label><div class="inp"><input id="pr-min" inputmode="decimal" value="4.5"><em>min</em></div></div>
+          <div class="field"><label for="pr-h">你的小时成本（含社保）</label><div class="inp"><input id="pr-h" inputmode="decimal" value="29.50"><em>€/小时</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-prod"></div>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-m2" aria-labelledby="qt-m2" hidden>
+      <form data-q="m2" novalidate class="stack">
+        <h3 style="font-size:1.4rem">你每平方米的底价是多少？</h3>
+        <p class="small mute">示例：瓦屋面，4 人团队。</p>
+        <div class="fields">
+          <div class="field"><label for="m2-mat">每平方米材料（含边角料）</label><div class="inp"><input id="m2-mat" inputmode="decimal" value="24.38"><em>€/m²</em></div></div>
+          <div class="field"><label for="m2-eq">团队每天成本</label><div class="inp"><input id="m2-eq" inputmode="decimal" value="1120"><em>€/天</em></div></div>
+          <div class="field"><label for="m2-r">团队每天完成的 m²</label><div class="inp"><input id="m2-r" inputmode="decimal" value="88"><em>m²/天</em></div></div>
+          <div class="field"><label for="m2-f">其他每日费用（脚手架、机械、交通）</label><div class="inp"><input id="m2-f" inputmode="decimal" value="105"><em>€/天</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-m2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALCUL COMPLET ============ -->
+<section id="v-calcul" data-view="calcul" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">完整计算</p>
+      <h2>你的真实价格，一项不漏</h2>
+      <p class="mute">每改一个数字，结果都会更新。已载入一个示例：请换成你自己的数字。</p>
+    </div>
+    <div class="types" role="group" aria-label="行业">
+      <button class="type" data-type="fabrication" aria-pressed="true"><b>生产制作</b><small>kg、升、件、批</small></button>
+      <button class="type" data-type="travaux" aria-pressed="false"><b>施工工程</b><small>每平方米价格</small></button>
+      <button class="type" data-type="services" aria-pressed="false"><b>服务</b><small>小时费率</small></button>
+    </div>
+    <div class="calc">
+      <div class="panel">
+        <div class="fields two" style="margin-bottom:16px">
+          <div class="field"><label for="c-name">计算名称</label><div class="inp"><input id="c-name" class="txt" autocomplete="off"></div></div>
+          <div class="field"><label for="c-client">客户（选填）</label><div class="inp"><input id="c-client" class="txt" autocomplete="off"></div></div>
+        </div>
+        <p class="notice" id="c-example-note">已载入示例：请把每个数字换成你自己的。</p>
+        <form id="c-form" novalidate style="margin-top:16px"></form>
+        <div class="btn-row" style="margin-top:18px">
+          <button class="btn btn-line btn-sm" id="c-example" type="button">重新载入示例</button>
+          <button class="btn btn-ghost btn-sm" id="c-clear" type="button">全部清空</button>
+        </div>
+      </div>
+      <div class="sticky">
+        <div class="devis" id="c-result" aria-live="polite"></div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-hivis" id="c-save" type="button">保存</button>
+          <button class="btn btn-line" id="c-pdf" type="button" hidden>PDF</button>
+          <button class="btn btn-line" id="c-copy" type="button">复制摘要</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ASSISTANT ============ -->
+<section id="v-assistant" data-view="assistant" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">AI 助手</p>
+      <h2>用你自己的话提问</h2>
+      <p class="mute">你的工程、产品或业务和示例不一样？描述给它听。助手会问你该问的问题，并用引擎算出你的真实价格。</p>
+    </div>
+    <div class="calc" style="margin-top:0">
+      <div class="panel chat">
+        <div class="thread" id="a-thread" aria-live="polite"></div>
+        <div class="chips" id="a-chips">
+          <button class="chip" type="button">我要给一个 180 m² 的瓦屋面报价。该收多少钱？</button>
+          <button class="chip" type="button">我的果酱每公斤该卖多少钱？</button>
+          <button class="chip" type="button">我是独立会计师，收费 €70/小时。我能靠这个过活吗？</button>
+        </div>
+        <form class="composer" id="a-form">
+          <label for="a-input" class="small mute" hidden>你的问题</label>
+          <textarea id="a-input" placeholder="输入问题，或用键盘上的麦克风口述…" rows="2"></textarea>
+          <button class="btn btn-hivis" id="a-send" type="submit">发送</button>
+          <button class="btn btn-line" id="a-stop" type="button" hidden>停止</button>
+        </form>
+        <p class="small mute" id="a-status"></p>
+        <div class="paywall" id="a-pay" hidden>
+          <p class="eyebrow" id="a-pay-kicker">订阅</p>
+          <h3>听得懂你的话、帮你算价格的助手</h3>
+          <p class="small" id="a-pay-msg"></p>
+          <p class="price" id="a-price"></p>
+          <button class="btn btn-hivis" id="a-sub" type="button">订阅</button>
+          <p class="small mute" id="a-terms">无最低期限：你随时可以在订阅管理页面取消。<a href="/zh/terms/">使用条款</a></p>
+          <form class="login" id="a-code" novalidate hidden>
+            <label for="a-code-in" class="small"><b>你有访问码吗？</b>在这里输入。</label>
+            <div class="inp"><input id="a-code-in" class="txt" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="PNR-XXXX-XXXX-XXXX"></div>
+            <button class="btn btn-hivis btn-sm" type="submit">进入</button>
+          </form>
+          <form class="login" id="a-login" novalidate>
+            <label for="a-email" class="small"><b>已经订阅了？</b>通过电子邮件接收你的登录链接。</label>
+            <div class="inp"><input id="a-email" type="email" class="txt" autocomplete="email" inputmode="email" placeholder="name@example.com"></div>
+            <button class="btn btn-line btn-sm" type="submit">接收链接</button>
+          </form>
+        </div>
+        <p class="small mute" id="a-account" hidden></p>
+      </div>
+      <div class="panel">
+        <h3 style="font-size:1.2rem;margin-bottom:12px">它的规则</h3>
+        <ul class="rules">
+          <li><span>它一次只问一个问题，用你这一行的行话。</span></li>
+          <li><span>它从不编造数字：增值税、所得税、社保、工效和采购价，都由你提供。</span></li>
+          <li><span>它自己不做计算：由引擎计算，助手只转述结果。</span></li>
+          <li><span>你可以在完整计算中打开它的计算，修改并保存。</span></li>
+        </ul>
+        <p class="small mute" style="margin-top:14px" id="a-note">助手使用你的 Claude 账户：第一次提问时会征求你的同意。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MES CALCULS ============ -->
+<section id="v-calculs" data-view="calculs" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">我的计算</p>
+      <h2>你的计算和你的采购价</h2>
+      <p class="mute" id="s-where">加载中…</p>
+    </div>
+    <div id="s-compare" style="margin-bottom:28px"></div>
+    <h3 style="font-size:1.3rem;margin-bottom:10px">已保存的计算</h3>
+    <div class="saved" id="s-list"></div>
+    <div id="s-lib" class="panel" style="margin-top:28px"></div>
+  </div>
+</section>
+
+<!-- ============ GUIDES ============ -->
+<section id="v-guides" data-view="guides" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">分行业指南</p>
+      <h2>真正重要的计算</h2>
+      <p class="mute">公式、数字示例，以及代价高昂的错误。</p>
+    </div>
+    <div class="guides" id="g-list"></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><p>模拟与管理工具。所有估算均基于你提供的数据，不构成税务、会计、法律或财务建议。你的各项义务请向专业人士核实。</p><nav class="foot-links" aria-label="指南"><a href="/zh/cost-price-calculator/">逐件计算你的成本价</a><a href="/zh/cost-price-per-kilo/">你每公斤（或每升）的成本价</a><a href="/zh/bread-cost-price/">一个面包的真实成本是多少？</a><a href="/zh/price-per-square-metre/">按你的实际工效算出每平方米价格</a><a href="/zh/roofing-price-per-m2/">瓦屋面每平方米价格：完整计算</a><a href="/zh/site-output-rate/">决定你利润（或亏损）的工效</a><a href="/zh/freelance-hourly-rate/">你的最低小时费率，以及应该收的费率</a><a href="/zh/accountant-hourly-rate/">会计师事务所的小时费率：完整示例</a><a href="/zh/billable-hours/">你的工时里有多少真正有人付钱？</a></nav><nav class="foot-links" aria-label="信息"><a href="/zh/legal-notice/">法律声明</a><a href="/zh/terms/">使用条款</a><a href="/zh/privacy/">隐私政策</a></nav></div></footer>
+<div class="mini" id="c-mini" hidden><div class="wrap mini-in" id="c-mini-body"></div></div>
+<datalist id="lib-names"></datalist>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>window.PNR_EDITION='site';window.PNR_DEC='.';window.PNR_CUR='pre';window.PNR_PDF='print';</script>
+<script src="/assets/app.zh.js?v=202610180018" defer></script>
+<script>function pnrLang(s){var o=s.options[s.selectedIndex];try{localStorage.setItem("pnr-lang",o.lang)}catch(e){}location.href=s.value+(location.hash||"")}(function(){var B={"fr": {"t": "Ce site existe aussi en français.", "go": "Passer en français", "x": "Fermer"}, "en": {"t": "This site is also available in English.", "go": "Switch to English", "x": "Close"}, "es": {"t": "Este sitio también está disponible en español.", "go": "Cambiar a español", "x": "Cerrar"}, "de": {"t": "Diese Website gibt es auch auf Deutsch.", "go": "Auf Deutsch wechseln", "x": "Schließen"}, "zh": {"t": "本网站也有简体中文版。", "go": "切换到简体中文", "x": "关闭"}, "ru": {"t": "Этот сайт доступен и на русском языке.", "go": "Перейти на русский", "x": "Закрыть"}},cur=document.documentElement.lang;try{if(localStorage.getItem("pnr-lang"))return}catch(e){return}var p=(navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||""]).map(function(x){return String(x).slice(0,2).toLowerCase()}),best=null;for(var i=0;i<p.length;i++){if(B[p[i]]){best=p[i];break}}if(!best||best===cur)return;var o=document.querySelector('#lang-sel option[lang="'+best+'"]'),b=document.getElementById("lang-banner");if(!o||!b)return;var t=B[best],a=b.querySelector("a"),x=b.querySelector("button");b.querySelector("span").textContent=t.t;b.querySelector("span").lang=best;a.textContent=t.go;a.lang=best;a.href=o.value+(location.hash||"");a.addEventListener("click",function(){try{localStorage.setItem("pnr-lang",best)}catch(e){}});x.setAttribute("aria-label",t.x);x.addEventListener("click",function(){b.hidden=true;try{localStorage.setItem("pnr-lang",cur)}catch(e){}});b.hidden=false})();</script>
+</body></html>

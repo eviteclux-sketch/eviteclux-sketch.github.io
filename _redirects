@@ -1,1 +1,6 @@
 /api/*  https://vngwxpvvlgxukkcrctly.supabase.co/functions/v1/pnr_api/:splat  200!
+/en/*  /en/404.html  404
+/es/*  /es/404.html  404
+/de/*  /de/404.html  404
+/zh/*  /zh/404.html  404
+/ru/*  /ru/404.html  404

@@ -261,7 +261,10 @@ var TOOLS_DEF = {
 var $ = function(s, r){ return (r || document).querySelector(s); };
 var $$ = function(s, r){ return [].slice.call((r || document).querySelectorAll(s)); };
 function fmt(n, d){ if (d === undefined) d = 2; return Number(n).toLocaleString('fr-FR', {minimumFractionDigits: d, maximumFractionDigits: d}); }
-function eur(n, d){ return fmt(n, d === undefined ? 2 : d) + ' €'; }
+var CUR_PRE = window.PNR_CUR === 'pre';
+// minuscules dans une phrase, sauf en allemand (les noms y gardent leur majuscule)
+function lower(s){ return window.PNR_LOWER === 'no' ? s : s.toLowerCase(); }
+function eur(n, d){ var s = fmt(n, d === undefined ? 2 : d); return CUR_PRE ? (s.charAt(0) === '-' ? '-€' + s.slice(1) : '€' + s) : s + ' €'; }
 var DOT_THOUSANDS = /^-?[1-9]\d{0,2}(\.\d{3})+(,\d+)?$/;
 // langues à point décimal (anglais, chinois) : la virgule sépare les milliers
 var DEC = window.PNR_DEC === '.' ? '.' : ',';
@@ -410,6 +413,7 @@ var UNIT_WORD = {'pièce': 'pièce', 'portion': 'portion', 'kg': 'kg', 'L': 'lit
 var VAT_RATES = {BE: ['21', '12', '6', '0'], LU: ['17', '14', '8', '3'], FR: ['20', '10', '5,5', '2,1'], CH: ['8,1', '3,8', '2,6'], autre: []};
 if (DEC === '.') Object.keys(VAT_RATES).forEach(function(k){ VAT_RATES[k] = VAT_RATES[k].map(function(x){ return x.replace(',', '.'); }); });
 var COUNTRY_OPTS = [['BE','Belgique'],['LU','Luxembourg'],['FR','France'],['CH','Suisse'],['autre','Autre pays']];
+var UNIT_PL = {'pièce': 'pièces', 'portion': 'portions', 'lot': 'lots', 'litre': 'litres'};
 var MAT_FACTOR = {kg: 1, g: 0.001, L: 1, cl: 0.01, ml: 0.001, 'pièce': 1};
 var BREAK_LABEL = {'Risques': 'Risques (impayés, invendus)', 'Frais sur CA': 'Frais d’encaissement'};
 function F(k, s, h, extra){ return Object.assign({k: k, s: s, h: h}, extra || {}); }
@@ -657,12 +661,15 @@ function runEngine(st){
 function L(label, value, cls){ return '<li class="' + (cls || '') + '"><span>' + label + '</span><i></i><span class="num">' + value + '</span></li>'; }
 function unitOf(st, r){ return st.type === 'fabrication' ? (UNIT_WORD[r.details.unit] || r.details.unit || 'pièce') : st.type === 'travaux' ? 'm²' : 'h'; }
 function netLabel(st){ return st.type === 'services' ? 'Bénéfice après impôt, en plus de ta rémunération' : 'Net réel après impôt'; }
+// avertissements du moteur à masquer selon le cas (mêmes textes que dans le moteur)
+var W_TARGET = 'Objectif impossible au taux actuel dans la capacité disponible.';
+var W_NOPRICE = ['Le prix actuel produit une perte dans les hypothèses saisies.', W_TARGET, 'Les retenues récupérables sont un décalage de trésorerie, pas une perte. Le coût de financement doit être renseigné séparément.'];
 function cleanWarnings(st, r){
   var hasPrice = r.revenue > 0;
   return r.warnings.filter(function(w){
     if (w === PNR.DISCLAIMER) return false;
-    if (!hasPrice && /perte|impossible/i.test(w)) return false;
-    if (/Objectif impossible/.test(w) && !(r.details.targetNet > 0)) return false;
+    if (!hasPrice && W_NOPRICE.indexOf(w) >= 0) return false;
+    if (w === W_TARGET && !(r.details.targetNet > 0)) return false;
     return true;
   });
 }
@@ -674,7 +681,7 @@ function resultHTML(st, run){
   var h = '';
   if (run.notes.length) h += '<p class="gap">' + run.notes.map(esc).join('<br>') + '</p>';
   var ex = run.extra || {};
-  var uPl = (u === 'kg' || u === 'litre') ? u : u + 's';
+  var uPl = UNIT_PL[u] || u;
   if (ex.unsold) h += '<p class="limit" style="border:0;padding:0">Calcul sur ' + fmt(d.quantity, d.quantity % 1 ? 2 : 0) + ' ' + uPl + ' vendus sur ' + fmt(ex.produced, ex.produced % 1 ? 2 : 0) + ' produits (' + fmt(ex.unsold, 1) + ' % d’invendus) : le coût est réparti sur ce qui est vendu.</p>';
   h += '<p class="eyebrow">Ton prix plancher</p><p class="big">' + eur(r.minimumPrice) + '<small>HT' + per + '</small></p>' +
     '<p class="small" style="color:var(--night-mute)">Sous ce prix, tu perds de l’argent : il paie tous tes coûts, tes risques et tes frais, sans bénéfice.</p><ul class="lines">';
@@ -731,7 +738,7 @@ function resultHTML(st, run){
       else h += '<p class="gap">Si ton équipe descend sous <b>' + fmt(d.displayedEquilibriumYield, 2) + ' m² par homme et par jour</b>, ce chantier te coûte de l’argent. Tu prévois ' + fmt(planned, 2) + '.</p>';
     } else if (d.equilibriumStatus === 'impossible') h += '<p class="verdict">Même avec une équipe infiniment rapide, ce prix ne paie pas les matériaux et les frais fixes du chantier.</p>';
   }
-  var zero = CFG[st.type].watch.filter(function(k){ return !(parseNum(st.v[k]) > 0); }).map(function(k){ return (LABELS[k] || k).split(' (')[0].toLowerCase(); });
+  var zero = CFG[st.type].watch.filter(function(k){ return !(parseNum(st.v[k]) > 0); }).map(function(k){ return lower((LABELS[k] || k).split(' (')[0]); });
   if (zero.length) h += '<p class="limit">Comptés à 0 dans ce calcul : ' + zero.join(', ') + '. Vérifie que c’est voulu.</p>';
   var warns = cleanWarnings(st, r);
   if (warns.length) h += '<ul class="warns">' + warns.map(function(w){ return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>';
@@ -805,7 +812,7 @@ $('#c-form').addEventListener('click', function(e){
     var n = 0;
     (S.lists[b.dataset.libsave] || []).forEach(function(r){ if (blank(r.name) || blank(r.price) || isNaN(parseNum(r.price))) return; Lib.upsert({name: String(r.name).trim(), u: r.u || '', price: r.price, kind: S.type}); n++; });
     if (!n){ toast('Rien à enregistrer : donne un nom et un prix à chaque ligne.'); return; }
-    Lib.save().then(function(){ toast(n + ' prix enregistré' + (n > 1 ? 's' : '') + ' dans « Mes prix d’achat ».'); renderDatalist(); }, function(){ toast('Enregistrement impossible dans ce navigateur.'); });
+    Lib.save().then(function(){ toast(n + (n > 1 ? ' prix enregistrés' : ' prix enregistré') + ' dans « Mes prix d’achat ».'); renderDatalist(); }, function(){ toast('Enregistrement impossible dans ce navigateur.'); });
     return;
   }
   else return;
@@ -981,7 +988,7 @@ Store.remove = function(id){ return Store.ready.then(function(){
 $('#c-save').addEventListener('click', function(){
   compute(); if (!lastRun || lastRun.err) return;
   var r = lastRun.r;
-  var name = (S.name || '').trim() || ('Calcul ' + TYPE_NAME[S.type].toLowerCase());
+  var name = (S.name || '').trim() || ('Calcul ' + lower(TYPE_NAME[S.type]));
   var update = S.savedId && S.savedName === name;
   if (!update) S.savedId = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   var rec = {id: S.savedId, type: S.type, name: name, client: S.client || '', savedAt: new Date().toISOString(), v: S.v, lists: S.lists, mode: S.mode,
@@ -1102,7 +1109,7 @@ function compact(type, r, inputs){
     cout_de_revient_par_unite: r2(d.beforeFeesThreshold), prix_plancher_par_unite: r2(r.minimumPrice)};
   if (d.marginPercent > 0) o.prix_conseille_par_unite = r2(r.recommendedPrice);
   if (d.targetNet > 0) o.prix_pour_objectif_par_unite = r2(r.targetPrice);
-  o.couts = r.breakdown.filter(function(b){ return !/Risques|Frais sur CA|Impôt/.test(b.label) && Math.abs(b.amount) > 0.004; }).map(function(b){ return b.label + ' : ' + r2(b.amount); });
+  o.couts = r.breakdown.filter(function(b){ return ['Risques', 'Frais sur CA', 'Impôt estimé'].indexOf(b.label) < 0 && Math.abs(b.amount) > 0.004; }).map(function(b){ return b.label + ' : ' + r2(b.amount); });
   if (hasPrice){ o.prix_actuel_par_unite = r2(r.currentPrice); o.chiffre_affaires = r2(r.revenue); o.risques = r2(r.riskCost); o.frais = r2(r.feeCost); o.impot = r2(r.tax); o.reste_apres_impot = r2(r.net); }
   if (type === 'travaux'){ o.jours = d.days; if (hasPrice) o.rendement_minimum = d.equilibriumStatus === 'found' ? r2(d.displayedEquilibriumYield) : d.equilibriumStatus; }
   if (type === 'services'){ o.heures_facturees_par_an = r2(d.hours); o.charges_annuelles = r2(r.cost); if (hasPrice && d.targetNet > 0 && d.requiredHours !== null){ o.heures_necessaires_objectif = r2(d.requiredHours); o.objectif_impossible = d.impossible; } }

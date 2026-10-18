@@ -316,3 +316,19 @@ table.cmp td:first-child{min-width:170px}
 footer p{max-width:80ch}
 footer .foot-links a{text-decoration:none}
 footer .foot-links a:hover{text-decoration:underline}
+
+/* sélecteur de langue (toutes les pages) */
+.lang{position:relative;display:inline-flex;align-items:center;gap:6px;flex:none;margin-left:10px;padding:4px 30px 4px 10px;border:2px solid var(--hivis);border-radius:999px;color:var(--night-fg)}
+.lang-ico{width:18px;height:18px;flex:none;color:var(--hivis)}
+.lang select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background:transparent;border:0;color:inherit;font:700 .92rem var(--f-body);padding:4px 0;cursor:pointer;max-width:9.5em}
+.lang select:focus{outline:none}
+.lang:focus-within{box-shadow:0 0 0 3px hsl(28 100% 52% / .45)}
+.lang::after{content:"";position:absolute;right:12px;top:50%;margin-top:-2px;border:5px solid transparent;border-top-color:var(--hivis);pointer-events:none}
+.lang select option{color:#111;background:#fff}
+.lang-banner{background:var(--hivis);color:var(--on-hivis)}
+.lang-banner .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding-block:10px;font-weight:600}
+.lang-banner .btn{background:var(--night);color:var(--night-fg)}
+.lang-x{margin-left:auto;background:transparent;border:0;color:inherit;font-size:1.5rem;line-height:1;cursor:pointer;padding:2px 8px}
+@media (max-width:900px){.bar .lang{order:2;margin-left:auto}.bar .tabsnav{order:3}}
+/* montants : jamais coupés entre le nombre et l'unité */
+.lab .num{white-space:nowrap;flex:none}

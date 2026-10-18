@@ -1,0 +1,304 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Prix Net Réel: deine echte Marge für Bau, Herstellung, Stunden</title><meta name="description" content="Berechne in 2 Minuten deinen Mindestpreis, deinen empfohlenen Preis und was dir wirklich bleibt: pro Kilo, pro m² oder pro Stunde. Kostenlos, ohne Anmeldung."><link rel="canonical" href="https://prixnetreel.eviteclux.com/de/"><meta name="robots" content="noindex"><meta property="og:type" content="website"><meta property="og:title" content="Prix Net Réel: deine echte Marge für Bau, Herstellung, Stunden"><meta property="og:description" content="Berechne in 2 Minuten deinen Mindestpreis, deinen empfohlenen Preis und was dir wirklich bleibt: pro Kilo, pro m² oder pro Stunde. Kostenlos, ohne Anmeldung."><meta property="og:url" content="https://prixnetreel.eviteclux.com/de/"><meta property="og:locale" content="de_DE"><link rel="alternate" hreflang="fr" href="https://prixnetreel.eviteclux.com/"><link rel="alternate" hreflang="en" href="https://prixnetreel.eviteclux.com/en/"><link rel="alternate" hreflang="es" href="https://prixnetreel.eviteclux.com/es/"><link rel="alternate" hreflang="de" href="https://prixnetreel.eviteclux.com/de/"><link rel="alternate" hreflang="zh" href="https://prixnetreel.eviteclux.com/zh/"><link rel="alternate" hreflang="ru" href="https://prixnetreel.eviteclux.com/ru/"><link rel="alternate" hreflang="x-default" href="https://prixnetreel.eviteclux.com/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,600..900&family=JetBrains+Mono:wght@400;500&family=Public+Sans:wght@400;600;700&display=swap"><style>[hidden]:not([hidden=until-found i]){display:none!important}body{margin:0}</style><link rel="stylesheet" href="/assets/app.css?v=202610180018"></head><body><header class="bar">
+  <div class="wrap">
+    <a class="brand" href="/de/#accueil"><span class="brand-mark" aria-hidden="true">€</span><span>PRIX NET <span style="color:var(--hivis)">RÉEL</span></span></a>
+    <nav class="tabsnav" aria-label="Bereiche">
+      <a href="#accueil" data-nav="accueil">Start</a>
+      <a href="#tests" data-nav="tests">Schnelltests</a>
+      <a href="#calcul" data-nav="calcul">Vollständige Berechnung</a>
+      <a href="#assistant" data-nav="assistant">Assistent</a>
+      <a href="#calculs" data-nav="calculs">Meine Berechnungen</a>
+      <a href="#guides" data-nav="guides">Ratgeber</a>
+    </nav>
+    <div class="lang"><svg class="lang-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5M12 2.5C9.4 5.3 8.1 8.5 8.1 12s1.3 6.7 3.9 9.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><select id="lang-sel" aria-label="Sprache der Website" onchange="pnrLang(this)"><option value="/" lang="fr">Français</option><option value="/en/" lang="en">English</option><option value="/es/" lang="es">Español</option><option value="/de/" lang="de" selected>Deutsch</option><option value="/zh/" lang="zh">简体中文</option><option value="/ru/" lang="ru">Русский</option></select></div>
+  </div>
+</header><div id="lang-banner" class="lang-banner" hidden><div class="wrap"><span></span><a class="btn btn-sm" href="#"></a><button type="button" class="lang-x">×</button></div></div>
+
+<main>
+<!-- ============ ACCUEIL ============ -->
+<section id="v-accueil" data-view="accueil">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Herstellung · Bau · Selbstständige</p>
+        <h1 style="margin-top:14px">Du kennst deinen Verkaufspreis. Aber kennst du wirklich <span class="hl">deine&nbsp;Marge?</span></h1>
+        <p class="sub">Bei deiner Herstellung, deinen Baustellen oder deinen Stunden.</p>
+        <p class="pitch">Du bringst deine Erfahrung mit: deine Einheitspreise, deine Leistungen, deine Arbeitsweise. <b>Wir bringen dir das Tool, das in 2 Minuten die Realität deiner Kosten berechnet</b>, mit den Sätzen deines Landes, deinem Beruf, deinem Arbeitsort und den Zahlen deines Betriebs.</p>
+        <div class="btn-row">
+          <a class="btn btn-hivis" href="#tests">Kostenlos testen</a>
+          <a class="btn btn-line" href="#calcul">Vollständige Berechnung starten</a>
+        </div>
+      </div>
+      <aside class="ticket" aria-label="Rechenbeispiel: eine Backcharge mit 20 Broten">
+        <p class="eyebrow">Rechenbeispiel · vollständige Berechnung</p>
+        <h3>20 Bauernbrote, verkauft zu 3,76 € netto pro Stück</h3>
+        <ul class="casc" id="home-cascade"></ul>
+        <p class="foot">Der Bäcker glaubt, an der Backcharge <b class="num">26,38 €</b> zu verdienen. Mit Risiken, Gebühren und Steuern bleiben ihm <b class="num" style="color:var(--ok)">17,98 €</b>.</p>
+      </aside>
+    </div>
+  </div>
+  <div class="hazard" aria-hidden="true"></div>
+
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">Das echte Problem</p>
+      <h2>Deine Kosten ändern sich. Und dein&nbsp;Preis?</h2>
+      <p class="mute">Diesel, Strom, Mehl, Stahl: Deine Einkaufspreise ändern sich ohne Vorwarnung. Und dein Verkaufspreis, von wann ist der?</p>
+    </div>
+    <div class="costs">
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="8" width="20" height="34" rx="3" fill="none" stroke="var(--ink)" stroke-width="3"/><rect x="12" y="13" width="12" height="9" fill="var(--hivis)"/><path d="M28 18h5l4 5v13a3 3 0 0 1-6 0v-8h-3" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><line x1="5" y1="42" x2="31" y2="42" stroke="var(--ink)" stroke-width="3"/></svg>
+        <h3>Kraftstoff</h3><p class="small mute">Jede Tankfüllung belastet jede Baustelle und jede Lieferung.</p>
+      </div>
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M27 4 11 27h11l-3 17 18-25H26l1-15Z" fill="var(--hivis)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/></svg>
+        <h3>Energie</h3><p class="small mute">Ofen, Werkstatt, Büro: Die Stromrechnung verteilt sich auf jede Stunde.</p>
+      </div>
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 10h20l4 6v24a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V16l4-6Z" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M10 16h28" stroke="var(--ink)" stroke-width="3"/><rect x="16" y="23" width="16" height="10" fill="var(--hivis)"/></svg>
+        <h3>Material</h3><p class="small mute">Mehl, Holz, Stahl, Ziegel: Der Einkaufspreis von gestern ist nicht mehr der von heute.</p>
+      </div>
+      <div class="cost">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M24 13v12l8 5" fill="none" stroke="var(--hivis)" stroke-width="4" stroke-linecap="round"/></svg>
+        <h3>Deine Stunde</h3><p class="small mute">Löhne, Abgaben, nicht abgerechnete Zeit: Deine Stunde kostet mehr, als du denkst.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <p>Berechne deinen Preis in 2 Minuten neu, mit deinen Zahlen von heute.</p>
+      <a class="btn btn-hivis" href="#tests">Willst du&nbsp;testen?</a>
+    </div>
+  </div>
+
+  <div class="wrap sec" style="padding-top:0">
+    <div class="sec-head">
+      <p class="eyebrow">Drei Branchen, ein Rechenkern</p>
+      <h2>Wähle deine Branche</h2>
+    </div>
+    <div class="trades">
+      <button class="trade" data-open="fabrication"><span class="units">pro Kilo · pro Liter · pro Stück</span><h3>Herstellung</h3><span class="small mute">Bäcker, Caterer, Werkstätten, Produzenten. Material, Verluste, Zeit, Kosten: dein Mindestpreis pro Einheit.</span></button>
+      <button class="trade" data-open="travaux"><span class="units">pro m²</span><h3>Bau</h3><span class="small mute">Dachdecker, Fliesenleger, Maler, Bauunternehmen. Deine Leistung, dein Team, deine Tageskosten.</span></button>
+      <button class="trade" data-open="services"><span class="units">pro Stunde</span><h3>Dienstleistungen</h3><span class="small mute">Selbstständige, Buchhalter, Büros, Berater. Dein echter Stundensatz, gemessen an den wirklich abgerechneten Stunden.</span></button>
+    </div>
+  </div>
+
+  <div class="wrap sec" style="padding-top:0">
+    <div class="sec-head">
+      <p class="eyebrow">So funktioniert es</p>
+      <h2>Deine Zahlen, unser Rechenkern</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><b>1. Du gibst deine Zahlen ein</b><span class="small mute">Einkaufspreise, Zeit, Leistung, Kosten. Niemand kennt sie besser als du: Das Tool erfindet nichts.</span></div>
+      <div class="step"><b>2. Der Rechenkern rechnet</b><span class="small mute">Selbstkosten, Risiken, Gebühren, Steuern. Gerüsttage werden voll bezahlt, nicht abgerechnete Zeit zählt mit.</span></div>
+      <div class="step"><b>3. Du kennst deinen echten Preis</b><span class="small mute">Deinen Mindestpreis, deinen empfohlenen Preis, den Preis, um zu verdienen, was du willst, und dein echtes Netto.</span></div>
+    </div>
+    <p class="testnote" style="margin-top:22px">Schnelltests, vollständige Berechnung und Ratgeber kostenlos, ohne Anmeldung. Deine Berechnungen bleiben in deinem Browser. Der KI-Assistent ist in einem privaten Test, auf Einladung. Die Sätze für MwSt., Steuern und Abgaben gibst du selbst ein: Sie hängen von deinem Land und deinem Status ab.</p>
+  </div>
+</section>
+
+<!-- ============ TESTS RAPIDES ============ -->
+<section id="v-tests" data-view="tests" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">Kostenlos · 30 Sekunden</p>
+      <h2>Willst du&nbsp;testen? Wähle eine Frage.</h2>
+      <p class="mute">Die vorausgefüllten Zahlen sind Beispiele. Trag deine ein.</p>
+    </div>
+    <div class="qtabs" role="tablist" aria-label="Die vier Tests">
+      <button class="qtab" role="tab" id="qt-taux" aria-controls="qp-taux" aria-selected="true"><small>Selbstständige</small><span>Dein echter&nbsp;Stundensatz?</span></button>
+      <button class="qtab" role="tab" id="qt-vehic" aria-controls="qp-vehic" aria-selected="false" tabindex="-1"><small>Alle Branchen</small><span>Was kosten deine&nbsp;Fahrzeuge?</span></button>
+      <button class="qtab" role="tab" id="qt-prod" aria-controls="qp-prod" aria-selected="false" tabindex="-1"><small>Herstellung</small><span>Was bringt dir ein&nbsp;Produkt?</span></button>
+      <button class="qtab" role="tab" id="qt-m2" aria-controls="qp-m2" aria-selected="false" tabindex="-1"><small>Bau</small><span>Dein Mindestpreis pro&nbsp;m²?</span></button>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-taux" aria-labelledby="qt-taux">
+      <form data-q="taux" novalidate class="stack">
+        <h3 style="font-size:1.4rem">Kennst du deinen echten Stundensatz?</h3>
+        <p class="small mute">Beispiel: ein Selbstständiger allein, 60.000 € Kosten pro Jahr.</p>
+        <div class="fields">
+          <div class="field"><label for="ta-ch">Gesamte Jahreskosten, inkl. deines Lohns</label><div class="inp"><input id="ta-ch" inputmode="decimal" value="60000"><em>€ / Jahr</em></div></div>
+          <div class="field"><label for="ta-h">Gearbeitete Stunden pro Woche</label><div class="inp"><input id="ta-h" inputmode="decimal" value="40"><em>h</em></div></div>
+          <div class="field"><label for="ta-s">Arbeitswochen pro Jahr</label><div class="inp"><input id="ta-s" inputmode="decimal" value="44"><em>Wo.</em></div></div>
+          <div class="field"><label for="ta-p">Davon wirklich abgerechneter Anteil</label><div class="inp"><input id="ta-p" inputmode="decimal" value="62"><em>%</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-taux"></div>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-vehic" aria-labelledby="qt-vehic" hidden>
+      <form data-q="vehic" novalidate class="stack">
+        <h3 style="font-size:1.4rem">Was kosten dich deine Fahrzeuge wirklich?</h3>
+        <p class="small mute">Beispiel: 2 Diesel-Transporter im Leasing.</p>
+        <div class="fields two">
+          <div class="field"><label for="ve-n">Anzahl Fahrzeuge</label><div class="inp"><input id="ve-n" inputmode="decimal" value="2"></div></div>
+          <div class="field"><label for="ve-km">Kilometer pro Jahr und Fahrzeug</label><div class="inp"><input id="ve-km" inputmode="decimal" value="25000"><em>km</em></div></div>
+          <div class="field"><label for="ve-c">Verbrauch</label><div class="inp"><input id="ve-c" inputmode="decimal" value="8"><em>L/100 km</em></div></div>
+          <div class="field"><label for="ve-p">Kraftstoffpreis</label><div class="inp"><input id="ve-p" inputmode="decimal" value="1,65"><em>€/L</em></div></div>
+          <div class="field"><label for="ve-a">Versicherung und Steuern pro Fahrzeug</label><div class="inp"><input id="ve-a" inputmode="decimal" value="1200"><em>€/Jahr</em></div></div>
+          <div class="field"><label for="ve-e">Wartung und Reifen pro Fahrzeug</label><div class="inp"><input id="ve-e" inputmode="decimal" value="900"><em>€/Jahr</em></div></div>
+          <div class="field"><label for="ve-l">Leasing oder Abschreibung pro Fahrzeug</label><div class="inp"><input id="ve-l" inputmode="decimal" value="4800"><em>€/Jahr</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-vehic"></div>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-prod" aria-labelledby="qt-prod" hidden>
+      <form data-q="prod" novalidate class="stack">
+        <h3 style="font-size:1.4rem">Was bringt dir ein Produkt wirklich ein?</h3>
+        <p class="small mute">Beispiel: ein Bauernbrot mit 700 g.</p>
+        <div class="fields">
+          <div class="field"><label for="pr-pv">Verkaufspreis netto</label><div class="inp"><input id="pr-pv" inputmode="decimal" value="3,76"><em>€/Stück</em></div></div>
+          <div class="field"><label for="pr-m">Material pro Stück</label><div class="inp"><input id="pr-m" inputmode="decimal" value="0,2287"><em>€/Stück</em></div></div>
+          <div class="field"><label for="pr-min">Arbeitsminuten pro Stück</label><div class="inp"><input id="pr-min" inputmode="decimal" value="4,5"><em>min</em></div></div>
+          <div class="field"><label for="pr-h">Deine Stundenkosten, inkl. Abgaben</label><div class="inp"><input id="pr-h" inputmode="decimal" value="29,50"><em>€/h</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-prod"></div>
+    </div>
+
+    <div class="qpanel" role="tabpanel" id="qp-m2" aria-labelledby="qt-m2" hidden>
+      <form data-q="m2" novalidate class="stack">
+        <h3 style="font-size:1.4rem">Wie hoch ist dein Mindestpreis pro m²?</h3>
+        <p class="small mute">Beispiel: ein Ziegeldach, Team von 4.</p>
+        <div class="fields">
+          <div class="field"><label for="m2-mat">Material pro m², inkl. Verschnitt</label><div class="inp"><input id="m2-mat" inputmode="decimal" value="24,38"><em>€/m²</em></div></div>
+          <div class="field"><label for="m2-eq">Kosten des Teams pro Tag</label><div class="inp"><input id="m2-eq" inputmode="decimal" value="1120"><em>€/Tag</em></div></div>
+          <div class="field"><label for="m2-r">Vom Team geschaffte m² pro Tag</label><div class="inp"><input id="m2-r" inputmode="decimal" value="88"><em>m²/Tag</em></div></div>
+          <div class="field"><label for="m2-f">Sonstige Kosten pro Tag (Gerüst, Maschinen, Fahrten)</label><div class="inp"><input id="m2-f" inputmode="decimal" value="105"><em>€/Tag</em></div></div>
+        </div>
+      </form>
+      <div class="devis" aria-live="polite" id="qr-m2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALCUL COMPLET ============ -->
+<section id="v-calcul" data-view="calcul" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">Vollständige Berechnung</p>
+      <h2>Dein echter Preis, alles inklusive</h2>
+      <p class="mute">Das Ergebnis aktualisiert sich bei jeder Zahl. Ein Beispiel ist geladen: Ersetze es durch deine Zahlen.</p>
+    </div>
+    <div class="types" role="group" aria-label="Branche">
+      <button class="type" data-type="fabrication" aria-pressed="true"><b>Herstellung</b><small>kg, Liter, Stück, Charge</small></button>
+      <button class="type" data-type="travaux" aria-pressed="false"><b>Bau</b><small>Preis pro m²</small></button>
+      <button class="type" data-type="services" aria-pressed="false"><b>Dienstleistungen</b><small>Stundensatz</small></button>
+    </div>
+    <div class="calc">
+      <div class="panel">
+        <div class="fields two" style="margin-bottom:16px">
+          <div class="field"><label for="c-name">Name der Berechnung</label><div class="inp"><input id="c-name" class="txt" autocomplete="off"></div></div>
+          <div class="field"><label for="c-client">Kunde (optional)</label><div class="inp"><input id="c-client" class="txt" autocomplete="off"></div></div>
+        </div>
+        <p class="notice" id="c-example-note">Beispiel geladen: Ersetze jede Zahl durch deine.</p>
+        <form id="c-form" novalidate style="margin-top:16px"></form>
+        <div class="btn-row" style="margin-top:18px">
+          <button class="btn btn-line btn-sm" id="c-example" type="button">Beispiel neu laden</button>
+          <button class="btn btn-ghost btn-sm" id="c-clear" type="button">Alles leeren</button>
+        </div>
+      </div>
+      <div class="sticky">
+        <div class="devis" id="c-result" aria-live="polite"></div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-hivis" id="c-save" type="button">Speichern</button>
+          <button class="btn btn-line" id="c-pdf" type="button" hidden>PDF</button>
+          <button class="btn btn-line" id="c-copy" type="button">Zusammenfassung kopieren</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ASSISTANT ============ -->
+<section id="v-assistant" data-view="assistant" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">KI-Assistent</p>
+      <h2>Stell deine Frage mit deinen Worten</h2>
+      <p class="mute">Deine Baustelle, dein Produkt oder dein Auftrag passt nicht zu den Beispielen? Beschreib es. Der Assistent stellt dir die richtigen Fragen und ermittelt mit dem Rechenkern deinen echten Preis.</p>
+    </div>
+    <div class="calc" style="margin-top:0">
+      <div class="panel chat">
+        <div class="thread" id="a-thread" aria-live="polite"></div>
+        <div class="chips" id="a-chips">
+          <button class="chip" type="button">Ich muss ein Ziegeldach mit 180 m² kalkulieren. Wie viel berechne ich?</button>
+          <button class="chip" type="button">Welcher Kilopreis für meine Marmelade?</button>
+          <button class="chip" type="button">Ich bin selbstständiger Buchhalter mit 70 €/h. Kann ich davon leben?</button>
+        </div>
+        <form class="composer" id="a-form">
+          <label for="a-input" class="small mute" hidden>Deine Frage</label>
+          <textarea id="a-input" placeholder="Schreib oder diktiere deine Frage mit dem Mikrofon deiner Tastatur…" rows="2"></textarea>
+          <button class="btn btn-hivis" id="a-send" type="submit">Senden</button>
+          <button class="btn btn-line" id="a-stop" type="button" hidden>Stopp</button>
+        </form>
+        <p class="small mute" id="a-status"></p>
+        <div class="paywall" id="a-pay" hidden>
+          <p class="eyebrow" id="a-pay-kicker">Abo</p>
+          <h3>Der Assistent, der mit deinen Worten kalkuliert</h3>
+          <p class="small" id="a-pay-msg"></p>
+          <p class="price" id="a-price"></p>
+          <button class="btn btn-hivis" id="a-sub" type="button">Abonnieren</button>
+          <p class="small mute" id="a-terms">Ohne Vertragsbindung: Du kündigst jederzeit in deinem Abo-Bereich. <a href="/de/nutzungsbedingungen/">Allgemeine Geschäftsbedingungen</a></p>
+          <form class="login" id="a-code" novalidate hidden>
+            <label for="a-code-in" class="small"><b>Hast du einen&nbsp;Zugangscode?</b> Gib ihn hier ein.</label>
+            <div class="inp"><input id="a-code-in" class="txt" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="PNR-XXXX-XXXX-XXXX"></div>
+            <button class="btn btn-hivis btn-sm" type="submit">Einlösen</button>
+          </form>
+          <form class="login" id="a-login" novalidate>
+            <label for="a-email" class="small"><b>Schon&nbsp;abonniert?</b> Erhalte deinen Anmeldelink per E-Mail.</label>
+            <div class="inp"><input id="a-email" type="email" class="txt" autocomplete="email" inputmode="email" placeholder="deine@adresse.de"></div>
+            <button class="btn btn-line btn-sm" type="submit">Link anfordern</button>
+          </form>
+        </div>
+        <p class="small mute" id="a-account" hidden></p>
+      </div>
+      <div class="panel">
+        <h3 style="font-size:1.2rem;margin-bottom:12px">Seine Regeln</h3>
+        <ul class="rules">
+          <li><span>Er stellt eine Frage nach der anderen, in der Sprache deines Berufs.</span></li>
+          <li><span>Er erfindet nie eine Zahl: MwSt., Steuern, Abgaben, Leistungen und Einkaufspreise gibst du selbst ein.</span></li>
+          <li><span>Er rechnet nicht selbst: Der Rechenkern rechnet, der Assistent übernimmt die Ergebnisse.</span></li>
+          <li><span>Du kannst seine Berechnung in der vollständigen Berechnung öffnen, ändern und speichern.</span></li>
+        </ul>
+        <p class="small mute" style="margin-top:14px" id="a-note">Der Assistent nutzt dein Claude-Konto: Bei der ersten Frage wirst du um deine Zustimmung gebeten.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MES CALCULS ============ -->
+<section id="v-calculs" data-view="calculs" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">Meine Berechnungen</p>
+      <h2>Deine Berechnungen und deine Einkaufspreise</h2>
+      <p class="mute" id="s-where">Wird geladen…</p>
+    </div>
+    <div id="s-compare" style="margin-bottom:28px"></div>
+    <h3 style="font-size:1.3rem;margin-bottom:10px">Gespeicherte Berechnungen</h3>
+    <div class="saved" id="s-list"></div>
+    <div id="s-lib" class="panel" style="margin-top:28px"></div>
+  </div>
+</section>
+
+<!-- ============ GUIDES ============ -->
+<section id="v-guides" data-view="guides" hidden>
+  <div class="wrap sec">
+    <div class="sec-head">
+      <p class="eyebrow">Ratgeber nach Branche</p>
+      <h2>Die Berechnungen, die zählen</h2>
+      <p class="mute">Formeln, Rechenbeispiele und Fehler, die viel Geld kosten.</p>
+    </div>
+    <div class="guides" id="g-list"></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><p>Simulations- und Verwaltungstool. Schätzungen auf Basis deiner Daten, ohne Steuer-, Buchhaltungs-, Rechts- oder Finanzberatung. Prüfe deine Pflichten mit einer Fachperson.</p><nav class="foot-links" aria-label="Ratgeber"><a href="/de/selbstkosten-berechnen/">Berechne deine Selbstkosten, Stück für Stück</a><a href="/de/selbstkosten-pro-kilo/">Deine Selbstkosten pro Kilo (oder pro Liter)</a><a href="/de/selbstkosten-brot/">Was kostet dich ein Brot wirklich?</a><a href="/de/preis-pro-quadratmeter/">Dein Preis pro m², berechnet mit deiner echten Leistung</a><a href="/de/dach-preis-pro-m2/">Preis pro m² für ein Ziegeldach: die vollständige Berechnung</a><a href="/de/baustellen-leistung/">Die Leistung, die deine Marge macht (oder zerstört)</a><a href="/de/stundensatz-selbststaendige/">Dein Mindest-Stundensatz und der, den du abrechnen solltest</a><a href="/de/stundensatz-buchhaltung/">Stundensatz eines Steuerbüros: das vollständige Beispiel</a><a href="/de/abrechenbare-stunden/">Wie viele deiner Stunden werden wirklich bezahlt?</a></nav><nav class="foot-links" aria-label="Informationen"><a href="/de/impressum/">Impressum</a><a href="/de/nutzungsbedingungen/">Nutzungsbedingungen</a><a href="/de/datenschutz/">Datenschutz</a></nav></div></footer>
+<div class="mini" id="c-mini" hidden><div class="wrap mini-in" id="c-mini-body"></div></div>
+<datalist id="lib-names"></datalist>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>window.PNR_EDITION='site';window.PNR_LOWER='no';</script>
+<script src="/assets/app.de.js?v=202610180018" defer></script>
+<script>function pnrLang(s){var o=s.options[s.selectedIndex];try{localStorage.setItem("pnr-lang",o.lang)}catch(e){}location.href=s.value+(location.hash||"")}(function(){var B={"fr": {"t": "Ce site existe aussi en français.", "go": "Passer en français", "x": "Fermer"}, "en": {"t": "This site is also available in English.", "go": "Switch to English", "x": "Close"}, "es": {"t": "Este sitio también está disponible en español.", "go": "Cambiar a español", "x": "Cerrar"}, "de": {"t": "Diese Website gibt es auch auf Deutsch.", "go": "Auf Deutsch wechseln", "x": "Schließen"}, "zh": {"t": "本网站也有简体中文版。", "go": "切换到简体中文", "x": "关闭"}, "ru": {"t": "Этот сайт доступен и на русском языке.", "go": "Перейти на русский", "x": "Закрыть"}},cur=document.documentElement.lang;try{if(localStorage.getItem("pnr-lang"))return}catch(e){return}var p=(navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||""]).map(function(x){return String(x).slice(0,2).toLowerCase()}),best=null;for(var i=0;i<p.length;i++){if(B[p[i]]){best=p[i];break}}if(!best||best===cur)return;var o=document.querySelector('#lang-sel option[lang="'+best+'"]'),b=document.getElementById("lang-banner");if(!o||!b)return;var t=B[best],a=b.querySelector("a"),x=b.querySelector("button");b.querySelector("span").textContent=t.t;b.querySelector("span").lang=best;a.textContent=t.go;a.lang=best;a.href=o.value+(location.hash||"");a.addEventListener("click",function(){try{localStorage.setItem("pnr-lang",best)}catch(e){}});x.setAttribute("aria-label",t.x);x.addEventListener("click",function(){b.hidden=true;try{localStorage.setItem("pnr-lang",cur)}catch(e){}});b.hidden=false})();</script>
+</body></html>

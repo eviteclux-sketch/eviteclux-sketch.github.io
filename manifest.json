@@ -1,25 +1,45 @@
 {
- "site": "Prix Net Réel — édition gratuite",
+ "site": "Prix Net Réel — édition gratuite, 6 langues",
  "fichiers": {
   "404.html": {
-   "taille": 2978,
-   "sha256": "89f72ff47824d16864f59059d1b6d5d1d30cf0b5666b5ed61365159340e628d0"
+   "taille": 5657,
+   "sha256": "45fa7bf113e7d24825e45e849da51593b9f2a19ffa1b6c13dc8df3e422e34685"
   },
   "_headers": {
    "taille": 262,
    "sha256": "14277edbcd05893fa3599d39f0ace95f1bc3be6ed2be160350dfd1584c01363d"
   },
   "_redirects": {
-   "taille": 83,
-   "sha256": "d42a4fb82ef2cc7dca14a7be7cf88b988124f7025b27dfa5c76810da7263b881"
+   "taille": 208,
+   "sha256": "fd32ee9529490a8c1d18a858d2962739759d1675756fd050e85b43821e5013b6"
   },
   "assets/app.css": {
-   "taille": 22541,
-   "sha256": "2b979ab6654a85232577fa5fe211b8ebc81cf47c9c8fe69fe98bc80199d96f4d"
+   "taille": 23905,
+   "sha256": "79612e5b75de7d732fe9b233e6e03c4d6afed44124fc0cd38e0d25b178be560d"
+  },
+  "assets/app.de.js": {
+   "taille": 140194,
+   "sha256": "cf81bc1aeb4dbaffbaa872de165be82fc4dadf8f49e1ec0a8aaf74251c98ca0d"
+  },
+  "assets/app.en.js": {
+   "taille": 136519,
+   "sha256": "33cf66bfa8e81a1d8f571f6d4cdc4101c9039120d0ae37b707e750437fc66ac7"
+  },
+  "assets/app.es.js": {
+   "taille": 140092,
+   "sha256": "162d03ad3d658039d7531de8bdb00f783600e4b05b6a56bd2615b44b5f98317d"
   },
   "assets/app.js": {
-   "taille": 138209,
-   "sha256": "246a5e110a35c774427b3480f6325339f1b582c936c0c2913de4a74d0f024939"
+   "taille": 138962,
+   "sha256": "9b0b067290e8d71bd83e481128ab7186da3d44cd17c70ab1e3396ffe37661b11"
+  },
+  "assets/app.ru.js": {
+   "taille": 161620,
+   "sha256": "0fcb63ab091ad5fc64d449c24ceaa8427ad37f64f8479df25c91546457c5f6dd"
+  },
+  "assets/app.zh.js": {
+   "taille": 136344,
+   "sha256": "28a9b5cf2845d31be3be8f39c29f076beed37b4f3d58e49588708bb4b520b10a"
   },
   "assets/pdf-lib.LICENSE.md": {
    "taille": 1070,
@@ -30,72 +50,372 @@
    "sha256": "0f9a5cad07941f0826586c94e089d89b918c46e5c17cf2d5a3c6f666e3bc694f"
   },
   "calcul-prix-au-m2/index.html": {
-   "taille": 5839,
-   "sha256": "98b4548363fd974f47546612f8c590367d2784bd3d9f8d6da53bf65ed5d0692b"
+   "taille": 9376,
+   "sha256": "c4ced68f64a20e2e2b4d5b427b335bd5f7a07d1532cb9005113b518fa77fcfc5"
   },
   "calcul-prix-de-revient/index.html": {
-   "taille": 6048,
-   "sha256": "4a831d3d94de3f326c1cefecbcb46b53eccb525b44b8ac83094263766bc53281"
+   "taille": 9592,
+   "sha256": "49f3e40fc63c5208b3c84eddc2805038d418996069143e174260f00697c27f6d"
   },
   "calcul-taux-horaire-independant/index.html": {
-   "taille": 5807,
-   "sha256": "ac1d43b6479b31d996fd0c04d98a28bd01178b07965987b5136b918898ab2309"
+   "taille": 9388,
+   "sha256": "51670a4bac45f501bf530e9a179c8b96c17aa23bec1da6320d7f8e17a953d4c5"
   },
   "cgv/index.html": {
-   "taille": 4245,
-   "sha256": "d186ed0627461b41a65ffc9e13da28c282fba2cf59bcb8339a7d3f3badd38200"
+   "taille": 7604,
+   "sha256": "a0a228b73286bb4d5804a9f241ed4dae7a972a856fd907826faa4945ca7847db"
   },
   "confidentialite/index.html": {
-   "taille": 4920,
-   "sha256": "17e78b67a15be324025a732e3dbb837b5e65bb894bdf0c2e2c93940b07db932c"
+   "taille": 8309,
+   "sha256": "ebdcb7927c38466b0ed723bb71263f276b1b4b76367006e0b6eed94d055e31bc"
+  },
+  "de/404.html": {
+   "taille": 5775,
+   "sha256": "2adb5da654cda95aebc0a62527f71ac424f6cc973b69783e3313357aad2e72f3"
+  },
+  "de/abrechenbare-stunden/index.html": {
+   "taille": 8367,
+   "sha256": "9e7bbbf41184342f3b5300b74f25b83a49be49888dee5a917a0abed75bf4716a"
+  },
+  "de/baustellen-leistung/index.html": {
+   "taille": 8546,
+   "sha256": "6b91b0a236bea731f7a4c80c863ddfad7b0445f594e9a64878b1732546bba712"
+  },
+  "de/dach-preis-pro-m2/index.html": {
+   "taille": 9066,
+   "sha256": "3a79cb610ce50ab300330b9357244b5c1ae295e1e19d0afad785b7cdeb92ab31"
+  },
+  "de/datenschutz/index.html": {
+   "taille": 8445,
+   "sha256": "18d0e190ed09749acfa36db38de4c1ff3e07298ed3e711c781462a9e32dd2c47"
+  },
+  "de/impressum/index.html": {
+   "taille": 7264,
+   "sha256": "9a61a47934663933161d263ff295c95143f6fe6f7e2692bba2e7f1fcb34ae406"
+  },
+  "de/index.html": {
+   "taille": 26585,
+   "sha256": "8f70cadd890e54137d553044e556522f9dc3f649f15562ef2af73746b9ef23e0"
+  },
+  "de/nutzungsbedingungen/index.html": {
+   "taille": 7894,
+   "sha256": "50b050013f504dce99f60045a93a3cb1b93ce96d96473af0683d74106b128a35"
+  },
+  "de/preis-pro-quadratmeter/index.html": {
+   "taille": 9408,
+   "sha256": "79e06f0a44bbbf8fcba7186d46d22fde126747fefc3ac113229298bc3b49bd12"
+  },
+  "de/ratgeber/index.html": {
+   "taille": 7894,
+   "sha256": "c715328e50a3fa3a3faa8aed6e4892b64751dcfb5ae75d250d26a7f6b749da75"
+  },
+  "de/selbstkosten-berechnen/index.html": {
+   "taille": 9857,
+   "sha256": "750d9c7cb296aa43c7423e46af5419a8ff49f400bcd4eff0c38bfde0a2111a30"
+  },
+  "de/selbstkosten-brot/index.html": {
+   "taille": 8848,
+   "sha256": "783b9e5c6997ace0f1d83698a00a083e5a761c2f1a214465cabc16ac0afc2a83"
+  },
+  "de/selbstkosten-pro-kilo/index.html": {
+   "taille": 9465,
+   "sha256": "ff5cddc7abf499808019df04a39081fc98432dd6293d7eac9f8cda5db36456db"
+  },
+  "de/stundensatz-buchhaltung/index.html": {
+   "taille": 8485,
+   "sha256": "0698137e6390d2b5a1f5a3369618327c0b4a66cb4e85ef80db7464433e24c29e"
+  },
+  "de/stundensatz-selbststaendige/index.html": {
+   "taille": 9557,
+   "sha256": "e5036ccef68ffa6ac4a6c3cf5e5a2eba193376d42a064a8bf8e4e758da8087cd"
+  },
+  "en/404.html": {
+   "taille": 5582,
+   "sha256": "9536ae776bf1fd95f94886eb6ec246bf78edc9fd0e015de3c3b4dcba63df5d42"
+  },
+  "en/accountant-hourly-rate/index.html": {
+   "taille": 8176,
+   "sha256": "7d1024cf14c0def37f61985b60d169ebc3aeadc435c47b1b93e5142fa4e91852"
+  },
+  "en/billable-hours/index.html": {
+   "taille": 8024,
+   "sha256": "7ba449be1e71c1fc5c91220a40d92db3116ddd09842493ec4f52e8f1ba38925c"
+  },
+  "en/bread-cost-price/index.html": {
+   "taille": 8562,
+   "sha256": "d5c59586858eaccbee26f80b8a051581a0630f9dafca70375b22d78b5c7d3b79"
+  },
+  "en/cost-price-calculator/index.html": {
+   "taille": 9503,
+   "sha256": "f91a74b21b1298dc5ed778eaf8ae4a95b965b5c7e9f48e290163a00436842876"
+  },
+  "en/cost-price-per-kilo/index.html": {
+   "taille": 9073,
+   "sha256": "006358961c09321e691d80890cc5f20938f22783ad7ee0c1685c0a248a822671"
+  },
+  "en/freelance-hourly-rate/index.html": {
+   "taille": 9151,
+   "sha256": "7c8669306e7e225070e8e3bdda14008af922b7fdfbecbf574467698899a10ff7"
+  },
+  "en/guides/index.html": {
+   "taille": 7593,
+   "sha256": "92663e274522f25de50fc45cae1b46af349e637a9d930d31ba3fded086a6ee44"
+  },
+  "en/index.html": {
+   "taille": 25834,
+   "sha256": "c56f0528e857ab42fb2b93e3d564b598206765637ee3a11ffa60f064e8b2a9de"
+  },
+  "en/legal-notice/index.html": {
+   "taille": 7081,
+   "sha256": "06e66d197469e03a72d0bd53514856c649083477d87677d515ae38fab1867357"
+  },
+  "en/price-per-square-metre/index.html": {
+   "taille": 9038,
+   "sha256": "e0653bc41ef53bcea16da6c63dcf7598e46ecc5adcc3b24edba654e18b32f5af"
+  },
+  "en/privacy/index.html": {
+   "taille": 8132,
+   "sha256": "dba245a36361d48fae6cc2d541dc51fcf78bf5d6217761c2fcf3d4a77e8b4051"
+  },
+  "en/roofing-price-per-m2/index.html": {
+   "taille": 8747,
+   "sha256": "9e4660473a245d14e84b22cc7af9b3aed76fcb32b09103511713ac161c0e4953"
+  },
+  "en/site-output-rate/index.html": {
+   "taille": 8263,
+   "sha256": "f0cda8464a8cc7fa93561d99d7d60559803016bb64c4575a5d6b6cb77a1cc44f"
+  },
+  "en/terms/index.html": {
+   "taille": 7533,
+   "sha256": "d3a93373adfe63a81c30d71a1f4acc9b385a473a2964f1f9ab5767efbbd5be2a"
+  },
+  "es/404.html": {
+   "taille": 5726,
+   "sha256": "e7e89f4d80ee0e7627c5d3e53ddc15d873d312afdfd4791cdca29bd629b5d31d"
+  },
+  "es/aviso-legal/index.html": {
+   "taille": 7262,
+   "sha256": "3d07b08261cd1f889247ba7eca2626045e9eabaf7e8d4191a9e7e8be9d7095d2"
+  },
+  "es/calculo-coste-produccion/index.html": {
+   "taille": 9760,
+   "sha256": "6977edc489059a6206de8565207301566e51374f00c4914536b9a08387d251ee"
+  },
+  "es/condiciones/index.html": {
+   "taille": 7683,
+   "sha256": "551f8ca200c1e152f9bd01ec06807c6deb81863ae560c25eb88f943eefe1d5de"
+  },
+  "es/coste-del-pan/index.html": {
+   "taille": 8722,
+   "sha256": "1f3bc76f92f2abccde78e2febfeac188cf6b3b64573507169a7971825cadf049"
+  },
+  "es/coste-por-kilo/index.html": {
+   "taille": 9283,
+   "sha256": "c7cf8bc8dcdfc01827c1b58b3c73de4d13f819b022d768d74abe50362480fc08"
+  },
+  "es/guias/index.html": {
+   "taille": 7771,
+   "sha256": "340880a7d9c515a678b11983dcf363e2483447a9c86638567a8f24347a6fc324"
+  },
+  "es/horas-facturables/index.html": {
+   "taille": 8266,
+   "sha256": "ec659005b227a1da324ced72228eec4eaf5cec6941e448396dfcb317977df020"
+  },
+  "es/index.html": {
+   "taille": 26344,
+   "sha256": "28917921910ef4ddafa5133238ad7a28fe765eeef0c50db3ab34b948487dced9"
+  },
+  "es/precio-m2-tejado/index.html": {
+   "taille": 9073,
+   "sha256": "f969ece8d9e2ed91113cf41c303747e6e25058ba7a65cd0d24bd4f23c970d688"
+  },
+  "es/precio-por-metro-cuadrado/index.html": {
+   "taille": 9428,
+   "sha256": "527ed44c64437115b9274d256a9bda41a42e155f53386bee50c4029396327ea4"
+  },
+  "es/privacidad/index.html": {
+   "taille": 8413,
+   "sha256": "2f8d5327186c3ac5ccf557a8042d262dc2b3dc42557fe15d02cf836ec1085d9e"
+  },
+  "es/rendimiento-obra/index.html": {
+   "taille": 8505,
+   "sha256": "ae8e4b32986ae413ac3274f747617a534c7d135076acad01d0c048fd18767b32"
+  },
+  "es/tarifa-por-hora-autonomo/index.html": {
+   "taille": 9485,
+   "sha256": "54f132cd49d37beb33757b5da0adf3a2f37bdcc45e442fdf3eb8caa690877aea"
+  },
+  "es/tarifa-por-hora-contable/index.html": {
+   "taille": 8428,
+   "sha256": "ea825157b9806cf24768f3da9058f241ccd72e616a7bb9503f1551d2c70d4c68"
   },
   "favicon.svg": {
    "taille": 249,
    "sha256": "7276b952b8f9a8bb42f589b330cdb950006f10ad6470d7d9e12ab261db388012"
   },
   "guides/index.html": {
-   "taille": 4365,
-   "sha256": "41414d748c8e332da469a4d7f44a9f02802d7028423b16d74e3113f6d6ab78e5"
+   "taille": 7705,
+   "sha256": "3baa7f52a0a81b52ddff4a5a26891eef037704daffb0c770c910cca2a22af064"
   },
   "heures-facturables/index.html": {
-   "taille": 4733,
-   "sha256": "69d8087e358eb48312d644d46a1fefbd444642aa1db4ad2093679c6b703d54d7"
+   "taille": 8205,
+   "sha256": "ac7650ab76f0dcfa4d7931aee812a7c287ad0b76431293d65b844c7ea269f6bf"
   },
   "index.html": {
-   "taille": 23097,
-   "sha256": "1a203f8dd6a31c02d2c4a903f8638b99812f324fbbe3b96b2677fef1ac1e2afa"
+   "taille": 26350,
+   "sha256": "b96b0a034146f0aff52ec69c5095f96da483f7d96636508a72b9a14f71d652e0"
   },
   "mentions-legales/index.html": {
-   "taille": 3711,
-   "sha256": "d949b204e7ac00281492b7af140ff7e77dcda87e340e4c9b56d8b4c1aaae327b"
+   "taille": 7131,
+   "sha256": "d6f77a693f481f8cb231f1e4d495f9b9fc626bb5f7b7b46e8fea310c5c765a8d"
   },
   "prix-au-m2-toiture/index.html": {
-   "taille": 5514,
-   "sha256": "63ff7851f3310e664a9a27f93a288f71cd609ad37cca6fbe7067e6934dea34ae"
+   "taille": 9014,
+   "sha256": "9e3985342c1a24556df2f36383c9e666d4d89ab8e2ab91b7251495e3e5453de1"
   },
   "prix-de-revient-au-kilo/index.html": {
-   "taille": 5693,
-   "sha256": "c9ed5528b4eb57ee10185e410dfc7d02719efa64708ba44cc83a9711888a33be"
+   "taille": 9206,
+   "sha256": "d460a3d34a7dad512bfeaff95596a5147891cdbb71e8e8563f40231835a907e9"
   },
   "prix-de-revient-pain/index.html": {
-   "taille": 5186,
-   "sha256": "9209d43ed4c20ecf397d522ec1688fb63f68f551608b4820daac0bc2d954e2c9"
+   "taille": 8662,
+   "sha256": "213a635c4d8d9f422bc68fdbde31d2bb3a6f894240c6fe44f85714fd4b56eb0e"
   },
   "rendement-chantier/index.html": {
-   "taille": 4976,
-   "sha256": "d65c14fa3af76872f7b9ad9c451be81dcacf97716af4578cfee3e8e2afd4ece9"
+   "taille": 8456,
+   "sha256": "1ea33cb7f0fe880f75ffa2aa54d71ae89168634ab20ebf1fe1897d7a56132360"
   },
   "robots.txt": {
    "taille": 85,
    "sha256": "4dc90faf209b3821b2b48c0e6deaa982829754303554dda7f4e4b0cdbfa238b6"
   },
+  "ru/404.html": {
+   "taille": 6490,
+   "sha256": "6178ca0de9024b844b5eff4e3906429cf41cc8c5a9cf59fed76fd75e0bca7658"
+  },
+  "ru/accountant-hourly-rate/index.html": {
+   "taille": 10069,
+   "sha256": "f042aeebd1dbecb6eb638594340629d8d04921fc49942f3a1e08a05324320a05"
+  },
+  "ru/billable-hours/index.html": {
+   "taille": 9966,
+   "sha256": "cdedcf912d8332c90f4c569d21065a41c6378a338d9722e36d5898d19299de5b"
+  },
+  "ru/bread-cost-price/index.html": {
+   "taille": 10637,
+   "sha256": "cbc5e940c4d39314d5e16ea5ca8d3c54e344edb0baf26e07ea30d57f1b2d1c06"
+  },
+  "ru/cost-price-calculator/index.html": {
+   "taille": 12022,
+   "sha256": "01bd3b5c3765dfeb50fa1d7264a9ffcc036da9e490e2c5fbef4348a872d280c3"
+  },
+  "ru/cost-price-per-kilo/index.html": {
+   "taille": 11498,
+   "sha256": "de92271f28e003f648e7a670df3795c51b5943b46f5e6bc2e819b6c67669ae8c"
+  },
+  "ru/freelance-hourly-rate/index.html": {
+   "taille": 12045,
+   "sha256": "9b21de97a71e4aa664c1866e9d719468059a272a94197a617e07ce85203e1591"
+  },
+  "ru/guides/index.html": {
+   "taille": 9218,
+   "sha256": "d1e60dfd1c0ded2be9ff865f2dfc90451f6ee82f6463da90efc17483eaa3e63f"
+  },
+  "ru/index.html": {
+   "taille": 31643,
+   "sha256": "e5a355d1aa92cb5d528c33cad29d7edc9e31010592ce66f90573d46ee9e16b1f"
+  },
+  "ru/legal-notice/index.html": {
+   "taille": 8469,
+   "sha256": "960fba70414e77c7bc467e956d907aceed9067a51dba3d941a6e8f24d909f10a"
+  },
+  "ru/price-per-square-metre/index.html": {
+   "taille": 11565,
+   "sha256": "4cc8895473d767100acb28d0da58238151b0608f1c7f1175dc9ba2e4e05413a6"
+  },
+  "ru/privacy/index.html": {
+   "taille": 10252,
+   "sha256": "12281e925a84c3e9c50c6288447326d8e52ae60a9876323458da3e2facc88ee2"
+  },
+  "ru/roofing-price-per-m2/index.html": {
+   "taille": 11022,
+   "sha256": "43a57dfb6a926ae7772b4dc8c0331f4df1aeff4b4c293b24be7bde7ccf73a453"
+  },
+  "ru/site-output-rate/index.html": {
+   "taille": 10443,
+   "sha256": "999dbcde227fc103efd8313e4f020f78859ad30c3f35a8c947a049122bc677e8"
+  },
+  "ru/terms/index.html": {
+   "taille": 9303,
+   "sha256": "a0da2cb1dae4ab12212184e708db5507fd872be218b12c7eff1d861bae0f2cac"
+  },
   "sitemap.xml": {
-   "taille": 1283,
-   "sha256": "7f77b616d6c00890cc8749ae480719ae4ad92ad8fc1dc69c90b494427b5f0976"
+   "taille": 7243,
+   "sha256": "f7195d69676c4ca669299c851ab50ac8038f126dabb5df0a6f96595c32d5a9eb"
   },
   "taux-horaire-comptable/index.html": {
-   "taille": 4797,
-   "sha256": "54c4f477b995781429a9badee332f8b9791ea5a256b08381ad3e7bf538fbb8e8"
+   "taille": 8349,
+   "sha256": "62c5af9eaa29afa65ed116f9fa330635619949ad80ea2d7727fc82fdd555d8c0"
+  },
+  "zh/404.html": {
+   "taille": 5574,
+   "sha256": "4ec42e84fc5310a9a38aadeb200b1bf2c31dde8bc28a3dd97c106153c6b804b6"
+  },
+  "zh/accountant-hourly-rate/index.html": {
+   "taille": 8181,
+   "sha256": "0219e5fef421f2c2d062d842e1c4ebc51c47529e85cf5a88acafd0956a02b5d6"
+  },
+  "zh/billable-hours/index.html": {
+   "taille": 7983,
+   "sha256": "7da41955f740e3cb2a7da7dfd8b7f6c69c6d76a63e1680f633d73ec2a95343b1"
+  },
+  "zh/bread-cost-price/index.html": {
+   "taille": 8569,
+   "sha256": "0f4ce988353e6e1a8c0d67cbba74d52ed5614a4cbb2164c59b1d1a74b5757654"
+  },
+  "zh/cost-price-calculator/index.html": {
+   "taille": 9425,
+   "sha256": "3aaca65656f670aa491ae15b51675c1ee16905edc1b0a88432440a168b3b6d95"
+  },
+  "zh/cost-price-per-kilo/index.html": {
+   "taille": 8956,
+   "sha256": "ab20188f70f4c91357a7b12d5bfc367b71b42025a742e50a173da341e70eaaaa"
+  },
+  "zh/freelance-hourly-rate/index.html": {
+   "taille": 9112,
+   "sha256": "a19d7a4ee5c72cb9654ce79cfc8f0cce4733c1f316f7a4713acd29fd9aa66b78"
+  },
+  "zh/guides/index.html": {
+   "taille": 7561,
+   "sha256": "e3ad513a239569befee59304d4a4a72e99a05be1dded9679e69a9b37ebd555a2"
+  },
+  "zh/index.html": {
+   "taille": 25797,
+   "sha256": "4bf62d797778f3234e6074df8b1cd8fa72a8ccdd3a6a21f5aef1f102caf2caa6"
+  },
+  "zh/legal-notice/index.html": {
+   "taille": 6980,
+   "sha256": "e1c32ce86a2c9619e50a45ccfb46551658dc6a5a2b917e5cd206debc2eaf8b0b"
+  },
+  "zh/price-per-square-metre/index.html": {
+   "taille": 9050,
+   "sha256": "7b5f0ee37949c9d092ef8fa456aa3acf28aca4cea4695cbfbe00af2333861a71"
+  },
+  "zh/privacy/index.html": {
+   "taille": 7989,
+   "sha256": "242c9336b7d5428871a319e0366c7871e7ec74a1f7c59e09e2d4b56c66dc4031"
+  },
+  "zh/roofing-price-per-m2/index.html": {
+   "taille": 8728,
+   "sha256": "31d799a2c81b14f9b2caef3b041bb7077f61d052e9597e012ae893abb03f0737"
+  },
+  "zh/site-output-rate/index.html": {
+   "taille": 8144,
+   "sha256": "50da86e58331d1a8320e32408815dbb308dc5541d3679c959c07c550af3cc927"
+  },
+  "zh/terms/index.html": {
+   "taille": 7279,
+   "sha256": "99191a2c17a3cd0881bb5e29e6ad6ceaafe0e3433ce90e7519b2195bcd2db5d9"
   }
  }
 }
